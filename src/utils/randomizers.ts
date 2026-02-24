@@ -96,19 +96,17 @@ const generateRandomInstructions = (): string[] => {
   if (Math.random() < 0.1 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
   }
-  instructions.push(
+  const combineItem =
     randomInstructionParts.combine[
       Math.floor(Math.random() * randomInstructionParts.combine.length)
-    ],
-  )
+    ]
+  instructions.push(combineItem.text)
   if (Math.random() < 0.15 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
   }
   if (Math.random() < 0.8) {
-    let mix =
-      randomInstructionParts.mix[
-        Math.floor(Math.random() * randomInstructionParts.mix.length)
-      ]
+    const mixPool = combineItem.allowedMix ?? randomInstructionParts.mix
+    let mix = mixPool[Math.floor(Math.random() * mixPool.length)]
     if (Math.random() < 0.5) {
       const mix_until =
         randomInstructionParts.mix_until[

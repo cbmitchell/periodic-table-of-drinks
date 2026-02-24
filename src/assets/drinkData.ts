@@ -1,5 +1,5 @@
 import type { DrinkCellProps } from '../components/DrinkCell'
-import { randomIngredients } from '../utils/randomizers'
+import { generateRandomIngredients } from '../utils/randomizers'
 
 type DefaultCellData = Pick<DrinkCellProps, 'row' | 'col' | 'group'>
 
@@ -132,7 +132,6 @@ export const defaultCellMap = new Map(
 )
 // const cell = defaultCellMap.get(`${row},${col}`)
 
-
 const placeHolderIngredients = [
   '1 ½ oz chocolate vodka',
   '1 ½ oz Irish cream',
@@ -165,7 +164,7 @@ export const drinkData: DrinkCellProps[] = [
     title: "Bee's Knees",
     abbreviation: 'Bk',
     icon: 'collins',
-    ingredients: randomIngredients(),
+    ingredients: generateRandomIngredients(),
     instructions: placeholderInstructions,
     row: 1,
     col: 18,

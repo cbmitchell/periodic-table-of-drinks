@@ -1,8 +1,8 @@
-export type WeightedItemValue = string | number | undefined
+// export type WeightedItemValue = string | number | undefined
 
-export interface WeightedItem {
-  likelihood: number,
-  value: WeightedItemValue,
+export interface WeightedItem<T> {
+  likelihood: number
+  value: T
 }
 
 // Type for managing lists that are to be selected from at random.
@@ -12,17 +12,17 @@ export interface WeightedItem {
 //   associated element will be selected.
 // Probability of selection is calculated by dividing an item's likelihood by the total
 //   likelihood of all items in the list.
-export class WeightedList {
-  items: WeightedItem[]
+export class WeightedList<T> {
+  items: WeightedItem<T>[]
 
-  constructor(items: WeightedItem[]) {
-    this.items = items;
+  constructor(items: WeightedItem<T>[]) {
+    this.items = items
   }
 
-  randomlySelectItem(): WeightedItemValue {
-    const totalLikelihood = this.items.reduce((sum, i) => sum + i.likelihood, 0);
+  randomlySelectItem(): T {
+    const totalLikelihood = this.items.reduce((sum, i) => sum + i.likelihood, 0)
     let randomIndex = Math.floor(Math.random() * totalLikelihood)
-    
+
     for (const item of this.items) {
       randomIndex -= item.likelihood
       if (randomIndex <= 0) {
@@ -31,19 +31,22 @@ export class WeightedList {
     }
 
     // Fallback for floating-point edge cases (random * total == total exactly)
-    return this.items[this.items.length - 1].value;
+    return this.items[this.items.length - 1].value
   }
 
-  randomlySelectNDistinctItems(n: number): WeightedItemValue[] {
+  randomlySelectNDistinctItems(n: number): T[] {
     if (this.items.length <= n) {
-      return [...this.items].map(item => item.value)
+      return [...this.items].map((item) => item.value)
     }
 
     const remaining = [...this.items]
-    const selected: WeightedItem[] = []
-    
+    const selected: WeightedItem<T>[] = []
+
     for (let i = n; i > 0; i--) {
-      const totalLikelihood = remaining.reduce((sum, i) => sum + i.likelihood, 0)
+      const totalLikelihood = remaining.reduce(
+        (sum, i) => sum + i.likelihood,
+        0,
+      )
       let randomIndex = Math.floor(Math.random() * totalLikelihood)
 
       for (let j = 0; j < remaining.length; j++) {
@@ -56,6 +59,6 @@ export class WeightedList {
       }
     }
 
-    return selected.map(item => item.value)
+    return selected.map((item) => item.value)
   }
 }

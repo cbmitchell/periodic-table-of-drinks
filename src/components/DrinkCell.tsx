@@ -28,7 +28,7 @@ export const GLASS_TYPES = [
   'wine',
 ] as const
 
-export type GlassIconName = typeof GLASS_TYPES[number]
+export type GlassIconName = (typeof GLASS_TYPES)[number]
 
 const glassIconBasePath = 'glass-icons/black/'
 
@@ -51,16 +51,16 @@ const glassIcons: Record<GlassIconName, string> = {
 }
 
 const elementGroupColors: Record<ElementGroup, string> = {
-  alkali_metals: 'red',
-  alkaline_earth_metals: 'orange',
-  transition_metals: 'yellow',
-  post_transition_metals: 'teal',
-  metalloids: 'green',
-  nonmetals: 'purple',
-  halogens: 'cyan',
-  noble_gases: 'pink',
-  lanthanides: 'lightgreen',
-  actinides: 'lavender',
+  alkali_metals: '#f2b3d3',
+  alkaline_earth_metals: '#f2e2b3',
+  transition_metals: '#f1f2b3',
+  post_transition_metals: '#b3d5f2',
+  metalloids: '#b7f2b3',
+  nonmetals: '#e0b3f2',
+  halogens: '#b3f0f2',
+  noble_gases: '#f2b3b3',
+  lanthanides: '#daf2b3',
+  actinides: '#e0b3f2',
 }
 
 export const CELL_WIDTH = 256
@@ -71,7 +71,7 @@ export interface DrinkProps {
   abbreviation: string
   icon: GlassIconName
   ingredients: string[]
-  instructions?: string[]
+  instructions: string[]
   group?: ElementGroup
 }
 

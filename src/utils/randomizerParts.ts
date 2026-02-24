@@ -754,6 +754,11 @@ export const randomAmountParts: Record<AmountPart, string[]> = {
   unit: ['oz', 'tsp', 'gal'],
 }
 
+export type CombinePart = {
+  text: string,
+  allowedMix?: string[],
+}
+
 export const randomInstructionParts = {
   prepare: [
     'Prepare yourself',
@@ -802,25 +807,44 @@ export const randomInstructionParts = {
     'Take a break',
   ],
   combine: [
-    'Build in glass',
-    'Build in glass',
-    'Combine in blender',
-    'Combine in shaker',
-    'Build in large cauldron',
-    'Combine in large vat',
-  ],
+    {
+      text: 'Build in glass',
+      allowedMix: [
+        'Stir',
+        'Stir with barspoon',
+        'Whisk',
+        'Beat the devil out of it',
+        'Punch with fist',
+        'Chill',
+        'Microwave',
+        'Freeze',
+      ],
+    },
+    { text: 'Combine in blender', allowedMix: ['Blend'] },
+    { text: 'Combine in shaker', allowedMix: ['Dry shake', 'Shake'] },
+    {
+      text: 'Build in large cauldron',
+      allowedMix: ['Stir with large wooden spoon', 'Boil', 'Punch with fist'],
+    },
+    {
+      text: 'Combine in large vat',
+      allowedMix: ['Stir with large wooden spoon', 'Boil', 'Punch with fist'],
+    },
+  ] satisfies CombinePart[],
   mix: [
     'Blend',
     'Dry shake',
     'Shake',
     'Stir',
     'Stir with barspoon',
+    'Whisk',
     'Boil',
     'Stir with large wooden spoon',
     'Microwave',
     'Chill',
     'Beat the devil out of it',
     'Punch with fist',
+    'Freeze',
   ],
   mix_until: [
     'until dizzy',
