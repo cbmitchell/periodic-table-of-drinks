@@ -30,9 +30,12 @@ export function weightedRandom(thresholds: number[]): number {
 }
 
 const randomAmount = () => {
-  const quantity = new WeightedList(randomAmountParts.quantity).randomlySelectItem()
-  const units = ['oz', 'tsp', 'gal']
-  const randomUnit = units[weightedRandom([75, 20, 5])]
+  const quantity = new WeightedList(
+    randomAmountParts.quantity,
+  ).randomlySelectItem()
+  const randomUnit = new WeightedList(
+    randomAmountParts.unit,
+  ).randomlySelectItem()
   return `${quantity} ${randomUnit}`
 }
 
@@ -56,12 +59,14 @@ export const generateRandomIngredients = (): string[] => {
     .map((f) => `${randomAmount()} ${f}`)
 
   const numMouthfeels = weightedRandom([60, 30, 8, 2])
-  const mouthfeels = new WeightedList(randomIngredientParts.mouthfeel)
-    .randomlySelectNDistinctItems(numMouthfeels)
+  const mouthfeels = new WeightedList(
+    randomIngredientParts.mouthfeel,
+  ).randomlySelectNDistinctItems(numMouthfeels)
 
   const numGarnishes = weightedRandom([50, 40, 7, 3])
-  const garnishes = new WeightedList(randomIngredientParts.garnish)
-    .randomlySelectNDistinctItems(numGarnishes)
+  const garnishes = new WeightedList(
+    randomIngredientParts.garnish,
+  ).randomlySelectNDistinctItems(numGarnishes)
 
   ingredientsList.push(...spirits)
   ingredientsList.push(...mixers)
@@ -75,8 +80,9 @@ export const generateRandomIngredients = (): string[] => {
 const generateRandomInstructions = (): string[] => {
   const instructions: string[] = []
   const MAX_PREPARATIONS = 4
-  const preparations = new WeightedList(randomInstructionParts.prepare)
-    .randomlySelectNDistinctItems(MAX_PREPARATIONS)
+  const preparations = new WeightedList(
+    randomInstructionParts.prepare,
+  ).randomlySelectNDistinctItems(MAX_PREPARATIONS)
 
   if (Math.random() < 0.3 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
@@ -84,8 +90,9 @@ const generateRandomInstructions = (): string[] => {
   if (Math.random() < 0.1 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
   }
-  const combineItem = WeightedList.from<CombinePart>(randomInstructionParts.combine)
-    .randomlySelectItem()
+  const combineItem = WeightedList.from<CombinePart>(
+    randomInstructionParts.combine,
+  ).randomlySelectItem()
   instructions.push(combineItem.text)
   if (Math.random() < 0.15 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
@@ -94,8 +101,9 @@ const generateRandomInstructions = (): string[] => {
     const mixPool = combineItem.allowedMix ?? randomInstructionParts.mix
     let mix = WeightedList.from(mixPool).randomlySelectItem()
     if (Math.random() < 0.5) {
-      const mix_until = new WeightedList(randomInstructionParts.mix_until)
-        .randomlySelectItem()
+      const mix_until = new WeightedList(
+        randomInstructionParts.mix_until,
+      ).randomlySelectItem()
       mix = mix.concat(` ${mix_until}`)
     }
     instructions.push(mix)
