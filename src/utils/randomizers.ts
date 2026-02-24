@@ -7,6 +7,7 @@ import {
   randomTitleParts,
   randomIngredientParts,
   randomAmountParts,
+  randomInstructionParts,
 } from './randomizerParts'
 
 export type IngredientType =
@@ -40,7 +41,7 @@ function pickRandom<T>(arr: T[], n: number): T[] {
   return [...arr].sort(() => Math.random() - 0.5).slice(0, n)
 }
 
-export const randomIngredients = (): string[] => {
+export const generateRandomIngredients = (): string[] => {
   const ingredientsList: string[] = []
 
   const possibleNumSpirits = [1, 2, 3, 4]
@@ -80,128 +81,6 @@ export const randomIngredients = (): string[] => {
   ingredientsList.push(...garnishes)
 
   return ingredientsList
-}
-
-const randomInstructionParts = {
-  prepare: [
-    'Prepare yourself',
-    'Call a loved one',
-    'Stretch',
-    'Mentally prepare',
-    'Put on latex gloves',
-    'Blindfold yourself',
-    'Spin until dizzy',
-    'Lay down tarp',
-    'Open a window',
-    'Pull yourself together',
-    'Go to your happy place',
-    'Ruminate',
-    'Ponder',
-    'Prepare the sacrifice',
-    'Pray',
-    'Ensure you are alone',
-    'Turn off all the lights',
-    'Light a scented candle',
-    'Apply eye protection',
-    'Write your will',
-    'Meditate',
-    'Slap it',
-    'Imagine a vast ocean',
-    'Go take a nap',
-    'Have someone assist you',
-    'Release your inhibitions',
-    'Put on some classical music',
-    'Wear safety goggles',
-    'Wait 20 minutes',
-    'Microwave 2 minutes',
-    'Consider next move',
-    'Check taste',
-    'Take a deep breath',
-    'Whisper a secret aloud',
-    'Do a gratitude exercise',
-    'Lock your doors',
-    'Close the blinds',
-    'Put on your drinking hat',
-    'Recite the incantation',
-    'Draw the runes',
-    'Perform blood sacrifice',
-    'Scroll social media',
-    'Play smooth jazz',
-    'Take a break',
-  ],
-  combine: [
-    'Build in glass',
-    'Build in glass',
-    'Combine in blender',
-    'Combine in shaker',
-    'Build in large cauldron',
-  ],
-  mix: [
-    'Blend',
-    'Dry shake',
-    'Shake',
-    'Stir',
-    'Stir with barspoon',
-    'Boil',
-    'Stir with large wooden spoon',
-    'Microwave',
-    'Chill',
-    'Beat the devil out of it',
-  ],
-  mix_until: [
-    'until dizzy',
-    'until wet',
-    'until you smell smoke',
-    'until clear',
-    'until cloudy',
-    'until just right',
-    'until gasseous',
-    'until smooth',
-    'until thick',
-    'until frothy',
-    'until satisfied',
-    'until delicious',
-    "until you can't anymore",
-    'untkl viscous',
-    'until done',
-    'a few times',
-    'for 30 seconds',
-    'for 2 minutes',
-    'vigorously',
-    'violently',
-    'well',
-    'for a while',
-  ],
-  garnish: [
-    'Issue positive affirmations',
-    'Sneeze on it',
-    'Top with garnish',
-    'Coat rim of glass',
-    'Flip upside-down briefly',
-    'Light on fire',
-    'Decorate',
-    'Sign your name on it',
-  ],
-  serve: [
-    'Enjoy',
-    'Enjoy',
-    'Enjoy',
-    'Serve to enemy',
-    'Throw in the trash',
-    'Appreciate',
-    'Do not drink',
-    'Do not serve',
-    'Dump in the toilet',
-    'Serve to close friends',
-    'Serve & enjoy',
-    'Serve under cloche',
-    'Take a photo & post it',
-    'Let sit overnight',
-    'Drink with caution',
-    'Drink at your own risk',
-    'Sip slowly',
-    'Share with friends',
-  ],
 }
 
 const generateRandomInstructions = (): string[] => {
@@ -299,6 +178,7 @@ const generateRandomTitle = (): string => {
   return title
 }
 
+// Helper function for generateAbbreviation
 function firstLetters(str: string): string {
   return str
     .split(' ')
@@ -306,13 +186,14 @@ function firstLetters(str: string): string {
     .join('')
 }
 
+// Helper function for generateAbbreviation
 function twoChars(str: string): string {
   if (str.length === 0) return ''
   const first = str[0].toUpperCase()
   const second = str
     .split('')
     .slice(1)
-    .find((c) => /[a-zA-Z0-9]/.test(c))
+    .find((c) => /[A-Z]/.test(c))
   return first + (second ? second.toLowerCase() : '')
 }
 
@@ -320,7 +201,7 @@ function generateAbbreviation(title: string) {
   return twoChars(firstLetters(title))
 }
 
-function randomIcon(): GlassIconName {
+function generateRandomIcon(): GlassIconName {
   return GLASS_TYPES[Math.floor(Math.random() * GLASS_TYPES.length)]
 }
 
@@ -329,8 +210,8 @@ export function generateRandomDrink(): DrinkProps {
   return {
     title: title,
     abbreviation: generateAbbreviation(title),
-    icon: randomIcon(),
-    ingredients: randomIngredients(),
+    icon: generateRandomIcon(),
+    ingredients: generateRandomIngredients(),
     instructions: generateRandomInstructions(),
   }
 }
