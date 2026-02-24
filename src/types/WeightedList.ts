@@ -1,7 +1,5 @@
-// export type WeightedItemValue = string | number | undefined
-
 export interface WeightedItem<T> {
-  likelihood: number
+  likelihood?: number
   value: T
 }
 
@@ -13,10 +11,13 @@ export interface WeightedItem<T> {
 // Probability of selection is calculated by dividing an item's likelihood by the total
 //   likelihood of all items in the list.
 export class WeightedList<T> {
-  items: WeightedItem<T>[]
+  items: Required<WeightedItem<T>>[]
 
   constructor(items: WeightedItem<T>[]) {
-    this.items = items
+    this.items = items.map((item) => ({
+      ...item,
+      likelihood: item.likelihood ?? 1,
+    }))
   }
 
   randomlySelectItem(): T {
