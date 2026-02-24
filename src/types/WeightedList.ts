@@ -35,6 +35,10 @@ export class WeightedList<T> {
     return this.items[this.items.length - 1].value
   }
 
+  static from<T>(values: readonly T[]): WeightedList<T> {
+    return new WeightedList(values.map((value) => ({ value })))
+  }
+
   randomlySelectNDistinctItems(n: number): T[] {
     if (this.items.length <= n) {
       return [...this.items].map((item) => item.value)
