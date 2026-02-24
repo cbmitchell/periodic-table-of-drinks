@@ -1,162 +1,172 @@
 import {
-	Box,
-	Card,
-	CardContent,
-	Grid,
-	List,
-	ListItem,
-	ListItemText,
-	Typography,
-} from "@mui/material";
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material'
+import type { ElementGroup } from '../types/ElementGroup'
+import { defaultCellMap } from '../assets/drinkData'
 
-export type GlassIconName =
-	| "collins"
-	| "coup"
-	| "flute"
-	| "hurricane"
-	| "irish"
-	| "margarita"
-	| "martini"
-	| "mule"
-	| "pint"
-	| "rocks"
-	| "tiki"
-	| "wine";
+export const GLASS_TYPES = [
+  'collins',
+  'coup',
+  'flute',
+  'hurricane',
+  'irish',
+  'margarita',
+  'martini',
+  'mule',
+  'pint',
+  'rocks',
+  'shot',
+  'shooter',
+  'tiki',
+  'wine',
+] as const
 
-const glassIconBasePath = "glass-icons/black/";
+export type GlassIconName = typeof GLASS_TYPES[number]
 
+const glassIconBasePath = 'glass-icons/black/'
+
+// TODO: Pretty sure there's a fun TypeScript way to simplify this.
 const glassIcons: Record<GlassIconName, string> = {
-	collins: "collins.png",
-	coup: "coup.png",
-	flute: "flute.png",
-	hurricane: "hurricane.png",
-	irish: "irish.png",
-	margarita: "margarita.png",
-	martini: "martini.png",
-	mule: "mule.png",
-	pint: "pint.png",
-	rocks: "rocks.png",
-	tiki: "tiki.png",
-	wine: "wine.png",
-};
-
-export type ElementGroup =
-	| "alkali_metals"
-	| "alkaline_earth_metals"
-	| "transition_metals"
-	| "post_transition_metals"
-	| "metalloids"
-	| "nonmetals"
-	| "halogens"
-	| "noble_gases"
-	| "lanthanides"
-	| "actinides";
-
-const elementGroupColors: Record<ElementGroup, string> = {
-	alkali_metals: "red",
-	alkaline_earth_metals: "orange",
-	transition_metals: "yellow",
-	post_transition_metals: "teal",
-	metalloids: "green",
-	nonmetals: "purple",
-	halogens: "cyan",
-	noble_gases: "pink",
-	lanthanides: "lightgreen",
-	actinides: "lavender",
-};
-
-interface DrinkCellProps {
-	title: string;
-	abbreviation: string;
-	icon: GlassIconName;
-	ingredients: string[];
-	instructions?: string[];
-	group?: ElementGroup;
+  collins: 'collins.png',
+  coup: 'coup.png',
+  flute: 'flute.png',
+  hurricane: 'hurricane.png',
+  irish: 'irish.png',
+  margarita: 'margarita.png',
+  martini: 'martini.png',
+  mule: 'mule.png',
+  pint: 'pint.png',
+  rocks: 'rocks.png',
+  shot: 'shot.png',
+  shooter: 'shooter.png',
+  tiki: 'tiki.png',
+  wine: 'wine.png',
 }
 
-const CELL_WIDTH = 256;
-const CELL_HEIGHT = 320;
+const elementGroupColors: Record<ElementGroup, string> = {
+  alkali_metals: 'red',
+  alkaline_earth_metals: 'orange',
+  transition_metals: 'yellow',
+  post_transition_metals: 'teal',
+  metalloids: 'green',
+  nonmetals: 'purple',
+  halogens: 'cyan',
+  noble_gases: 'pink',
+  lanthanides: 'lightgreen',
+  actinides: 'lavender',
+}
+
+export const CELL_WIDTH = 256
+export const CELL_HEIGHT = 320
+
+export interface DrinkProps {
+  title: string
+  abbreviation: string
+  icon: GlassIconName
+  ingredients: string[]
+  instructions?: string[]
+  group?: ElementGroup
+}
+
+interface CellProps {
+  row: number
+  col: number
+}
+
+export interface DrinkCellProps extends DrinkProps, CellProps {}
 
 export function DrinkCell({
-	title,
-	abbreviation,
-	icon,
-	ingredients,
-	instructions = [""],
-	group = "actinides",
+  title,
+  abbreviation,
+  icon,
+  ingredients,
+  instructions = [''],
+  row,
+  col,
+  group = defaultCellMap.get(`${row},${col}`)!.group,
 }: DrinkCellProps) {
-	return (
-		<Card
-			sx={{
-				width: CELL_WIDTH,
-				height: CELL_HEIGHT,
-				backgroundColor: elementGroupColors[group],
-			}}
-		>
-			<CardContent>
-				<Grid container spacing={0}>
-					<Grid size={8}>
-						<Box>
-							<Typography
-								sx={{
-									fontWeight: "medium",
-									minHeight: 48,
-									lineHeight: 1.2,
-								}}
-							>
-								{title}
-							</Typography>
-							<Typography
-								sx={{
-									fontSize: 80,
-									fontWeight: "bold",
-									lineHeight: 0.8,
-									height: 64,
-								}}
-							>
-								{abbreviation}
-							</Typography>
-						</Box>
-					</Grid>
-					<Grid size={4} sx={{ position: "relative" }}>
-						<Box
-							component="img"
-							src={`${glassIconBasePath}${glassIcons[icon]}`}
-							sx={{ width: "100%", position: "absolute", bottom: 0 }}
-						></Box>
-					</Grid>
-					<Grid size={6}>
-						<Box sx={{ p: 1 }}>
-							<List dense sx={{ listStyleType: "disc", pl: 0 }}>
-								{ingredients.map((ingredient) => (
-									<ListItem key={ingredient} disablePadding>
-										<ListItemText
-											sx={{ fontSize: 8, display: "list-item", my: 0 }}
-											primary={ingredient}
-											slotProps={{ primary: { sx: { fontSize: "8pt" } } }}
-										/>
-									</ListItem>
-								))}
-							</List>
-						</Box>
-					</Grid>
-					<Grid size={6}>
-						<Box sx={{ p: 1 }}>
-							<List dense sx={{ listStyleType: "disc", pl: 0 }}>
-								{instructions.map((instruction) => (
-									<ListItem key={instruction} disablePadding>
-										<ListItemText
-											sx={{ fontSize: 8, display: "list-item", my: 0 }}
-											primary={instruction}
-											slotProps={{ primary: { sx: { fontSize: "8pt" } } }}
-										/>
-									</ListItem>
-								))}
-							</List>
-						</Box>
-					</Grid>
-				</Grid>
-			</CardContent>
-		</Card>
-	);
+  return (
+    <Card
+      sx={{
+        width: CELL_WIDTH,
+        height: CELL_HEIGHT,
+        backgroundColor: elementGroupColors[group!],
+        gridRow: row,
+        gridColumn: col,
+        overflow: 'hidden',
+      }}
+    >
+      <CardContent>
+        <Grid container spacing={0}>
+          <Grid size={8}>
+            <Box>
+              <Typography
+                sx={{
+                  fontWeight: 'medium',
+                  minHeight: 48,
+                  lineHeight: 1.2,
+                }}
+              >
+                {title}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: 80,
+                  fontWeight: 'bold',
+                  lineHeight: 0.8,
+                  height: 64,
+                }}
+              >
+                {abbreviation}
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid size={4} sx={{ position: 'relative' }}>
+            <Box
+              component="img"
+              src={`${glassIconBasePath}${glassIcons[icon]}`}
+              sx={{ width: '100%', position: 'absolute', bottom: 0 }}
+            ></Box>
+          </Grid>
+          <Grid size={6}>
+            <Box sx={{ p: 1 }}>
+              <List dense sx={{ listStyleType: 'disc', pl: 0 }}>
+                {ingredients.map((ingredient) => (
+                  <ListItem key={ingredient} disablePadding>
+                    <ListItemText
+                      sx={{ fontSize: 8, display: 'list-item', my: 0 }}
+                      primary={ingredient}
+                      slotProps={{ primary: { sx: { fontSize: '8pt' } } }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          </Grid>
+          <Grid size={6}>
+            <Box sx={{ p: 1 }}>
+              <List dense sx={{ listStyleType: 'disc', pl: 0 }}>
+                {instructions.map((instruction) => (
+                  <ListItem key={instruction} disablePadding>
+                    <ListItemText
+                      sx={{ fontSize: 8, display: 'list-item', my: 0 }}
+                      primary={instruction}
+                      slotProps={{ primary: { sx: { fontSize: '8pt' } } }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  )
 }
