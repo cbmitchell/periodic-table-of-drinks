@@ -130,7 +130,7 @@ const generateRandomTitle = (): string => {
     adverbPresent = true
   }
 
-  if (Math.random() < 0.8 || title.length > 0) {
+  if (Math.random() < 0.7 || title.length > 0) {
     title = title.concat(
       `${new WeightedList(randomTitleParts.adjective).randomlySelectItem()} `,
     )
@@ -141,11 +141,11 @@ const generateRandomTitle = (): string => {
     new WeightedList(randomTitleParts.noun).randomlySelectItem(),
   )
 
-  let secondaryNounThreshold = 0.75
+  let secondaryNounThreshold = 0.85
   if (adverbPresent) {
     secondaryNounThreshold = 0.1
   } else if (adjectivePresent) {
-    secondaryNounThreshold = 0.2
+    secondaryNounThreshold = 0.25
   }
   if (Math.random() < secondaryNounThreshold) {
     title = title.concat(
