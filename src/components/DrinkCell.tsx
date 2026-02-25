@@ -75,16 +75,18 @@ export function DrinkCell({
         {compact ? (
           <Grid container spacing={0}>
             <Grid size={8}>
-              <Typography
-                sx={{ fontSize: '8pt', lineHeight: 1.2, fontWeight: 'medium' }}
-              >
-                {title}
-              </Typography>
-              <Typography
-                sx={{ fontSize: 40, fontWeight: 'bold', lineHeight: 0.9 }}
-              >
-                {abbreviation}
-              </Typography>
+              <Box sx={{ position: 'relative', height: 100 }}>
+                <Typography
+                  sx={{ fontSize: '8pt', lineHeight: 1.2, fontWeight: 'medium' }}
+                >
+                  {title}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: 40, fontWeight: 'bold', lineHeight: 0.9, height: 36, position: 'absolute', bottom: 0 }}
+                >
+                  {abbreviation}
+                </Typography>
+              </Box>
             </Grid>
             <Grid size={4} sx={{ position: 'relative' }}>
               <Box
@@ -97,11 +99,10 @@ export function DrinkCell({
         ) : (
           <Grid container spacing={0}>
             <Grid size={8}>
-              <Box>
+              <Box sx={{ position: 'relative', height: 128 }}>
                 <Typography
                   sx={{
                     fontWeight: 'medium',
-                    minHeight: 48,
                     lineHeight: 1.2,
                   }}
                 >
@@ -113,6 +114,8 @@ export function DrinkCell({
                     fontWeight: 'bold',
                     lineHeight: 0.8,
                     height: 64,
+                    position: 'absolute',
+                    bottom: 0,
                   }}
                 >
                   {abbreviation}
@@ -123,7 +126,7 @@ export function DrinkCell({
               <Box
                 component="img"
                 src={`glass-icons/black/${icon}.png`}
-                sx={{ width: '100%', position: 'absolute', bottom: 0 }}
+                sx={{ height: '85%', position: 'absolute', bottom: 0 }}
               ></Box>
             </Grid>
             <Grid size={6}>
