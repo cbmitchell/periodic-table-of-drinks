@@ -80,14 +80,14 @@ const generateRandomInstructions = (): string[] => {
   if (Math.random() < 0.3 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
   }
-  if (Math.random() < 0.1 && preparations.length > 0) {
+  if (Math.random() < 0.07 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
   }
   const combineItem = WeightedList.from<CombinePart>(
     randomInstructionParts.combine,
   ).randomlySelectItem()
   instructions.push(combineItem.text)
-  if (Math.random() < 0.15 && preparations.length > 0) {
+  if (Math.random() < 0.1 && preparations.length > 0) {
     instructions.push(preparations.shift()!)
   }
   if (Math.random() < 0.8) {
@@ -120,12 +120,14 @@ const generateRandomInstructions = (): string[] => {
 
 const generateRandomTitle = (): string => {
   let title = ''
+  let adverbPresent = false
   let adjectivePresent = false
 
   if (Math.random() < 0.2) {
     title = title.concat(
       `${new WeightedList(randomTitleParts.adverb).randomlySelectItem()} `,
     )
+    adverbPresent = true
   }
 
   if (Math.random() < 0.8 || title.length > 0) {
@@ -139,7 +141,12 @@ const generateRandomTitle = (): string => {
     new WeightedList(randomTitleParts.noun).randomlySelectItem(),
   )
 
-  const secondaryNounThreshold = adjectivePresent ? 0.2 : 0.75
+  let secondaryNounThreshold = 0.75
+  if (adverbPresent) {
+    secondaryNounThreshold = 0.1
+  } else if (adjectivePresent) {
+    secondaryNounThreshold = 0.2
+  }
   if (Math.random() < secondaryNounThreshold) {
     title = title.concat(
       ` ${new WeightedList(randomTitleParts.secondary_noun).randomlySelectItem()}`,
