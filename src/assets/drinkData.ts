@@ -130,26 +130,4 @@ export const defaultCellMap = new Map(
   defaultCells.map((c) => [`${c.row},${c.col}`, c]),
 )
 
-
-export const drinkData: DrinkCellProps[] = [
-  {
-    title: 'Ethanol',
-    abbreviation: 'E',
-    icon: 'shot',
-    ingredients: ['Ethanol'],
-    instructions: ['Appreciate its beauty', 'Eventually dump', 'Do not drink'],
-    group: 'halogens',
-    row: 1,
-    col: 1,
-  },
-  {
-    title: "Bee's Knees",
-    abbreviation: 'Bk',
-    icon: 'collins',
-    ingredients: ['2 oz gin', '¾ oz lemon juice', '¾ oz honey syrup'],
-    instructions: ['Combine in shaker', 'Shake until chilled', 'Strain into glass', 'Enjoy'],
-    group: 'noble_gases',
-    row: 1,
-    col: 18,
-  },
-]
+export const drinkData: DrinkCellProps[] = []
