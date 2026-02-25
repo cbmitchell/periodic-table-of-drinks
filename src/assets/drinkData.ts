@@ -132,15 +132,6 @@ export const defaultCellMap = new Map(
 )
 // const cell = defaultCellMap.get(`${row},${col}`)
 
-const placeHolderIngredients = [
-  '1 ½ oz chocolate vodka',
-  '1 ½ oz Irish cream',
-  '1 ½ oz Kahlua',
-  '1 oz creme de cacao',
-  '48 oz chocolate ice cream',
-  'Chocolate syrup',
-  'Chocolate sprinkles',
-]
 const placeholderInstructions = [
   'Combine ingredients in blender',
   'Cover and blend well',
