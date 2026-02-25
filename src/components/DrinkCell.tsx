@@ -25,9 +25,9 @@ const elementGroupColors: Record<ElementGroup, string> = {
 }
 
 export const CELL_WIDTH = 256
-export const CELL_HEIGHT = 320
+export const CELL_HEIGHT = 340
 export const COMPACT_CELL_WIDTH = 104
-export const COMPACT_CELL_HEIGHT = 130
+export const COMPACT_CELL_HEIGHT = 138
 
 interface CellProps {
   row: number
@@ -77,12 +77,23 @@ export function DrinkCell({
             <Grid size={8}>
               <Box sx={{ position: 'relative', height: 100 }}>
                 <Typography
-                  sx={{ fontSize: '8pt', lineHeight: 1.2, fontWeight: 'medium' }}
+                  sx={{
+                    fontSize: '8pt',
+                    lineHeight: 1.2,
+                    fontWeight: 'medium',
+                  }}
                 >
                   {title}
                 </Typography>
                 <Typography
-                  sx={{ fontSize: 40, fontWeight: 'bold', lineHeight: 0.9, height: 36, position: 'absolute', bottom: 0 }}
+                  sx={{
+                    fontSize: 40,
+                    fontWeight: 'bold',
+                    lineHeight: 0.9,
+                    height: 36,
+                    position: 'absolute',
+                    bottom: 0,
+                  }}
                 >
                   {abbreviation}
                 </Typography>
