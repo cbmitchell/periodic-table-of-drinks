@@ -83,11 +83,7 @@ export function PeriodicTable({
 				<Box
 					sx={{
 						transform: `scale(${scale})`,
-						transformOrigin: "top left",
-						// Offset to re-center after top-left origin scaling
-						position: "relative",
-						top: `calc((${COMPACT_TABLE_HEIGHT}px * ${scale} - ${COMPACT_TABLE_HEIGHT}px) / 2 * -1 + (100vh - ${COMPACT_TABLE_HEIGHT}px * ${scale}) / 2)`,
-						left: `calc((${COMPACT_TABLE_WIDTH}px * ${scale} - ${COMPACT_TABLE_WIDTH}px) / 2 * -1 + (100vw - ${COMPACT_TABLE_WIDTH}px * ${scale}) / 2)`,
+						transformOrigin: "center",
 					}}
 				>
 					{grid}
