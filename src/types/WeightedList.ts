@@ -22,16 +22,16 @@ export class WeightedList<T> {
 
   randomlySelectItem(): T {
     const totalLikelihood = this.items.reduce((sum, i) => sum + i.likelihood, 0)
-    let randomIndex = Math.floor(Math.random() * totalLikelihood)
+    let r = Math.random() * totalLikelihood
 
     for (const item of this.items) {
-      randomIndex -= item.likelihood
-      if (randomIndex <= 0) {
+      r -= item.likelihood
+      if (r <= 0) {
         return item.value
       }
     }
 
-    // Fallback for floating-point edge cases (random * total == total exactly)
+    // Fallback for floating-point edge cases
     return this.items[this.items.length - 1].value
   }
 
@@ -52,11 +52,11 @@ export class WeightedList<T> {
         (sum, i) => sum + i.likelihood,
         0,
       )
-      let randomIndex = Math.floor(Math.random() * totalLikelihood)
+      let r = Math.random() * totalLikelihood
 
       for (let j = 0; j < remaining.length; j++) {
-        randomIndex -= remaining[j].likelihood
-        if (randomIndex <= 0) {
+        r -= remaining[j].likelihood
+        if (r <= 0) {
           selected.push(remaining[j])
           remaining.splice(j, 1)
           break

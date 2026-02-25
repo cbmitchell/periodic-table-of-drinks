@@ -5,6 +5,6 @@ export const lightTheme = createTheme({
         mode: 'light',
     },
     typography: {
-        fontFamily: '-apple-system',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }
 })
