@@ -5,7 +5,7 @@ export const GLASS_TYPES = [
   'coup',
   'flute',
   'hurricane',
-  'irish',
+  'toddy',
   'margarita',
   'martini',
   'mule',
