@@ -29,3 +29,8 @@ export interface DrinkProps {
   group?: ElementGroup
   atomic_number?: number
 }
+
+export interface DrinkList {
+  title: string
+  drinks: DrinkProps[]
+}

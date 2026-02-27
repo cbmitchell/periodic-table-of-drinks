@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@mui/material/styles";
-import { useEffect, useState } from "react";
-import { drinkData } from "./assets/drinkData";
+import { useEffect, useMemo, useState } from "react";
+import { drinkLists } from "./assets/drinkData";
 import { ControlPanel } from "./components/ControlPanel";
 import type { DrinkCellProps } from "./components/DrinkCell";
 import { DrinkDetailModal } from "./components/DrinkDetailModal";
@@ -8,13 +8,19 @@ import { PeriodicTable } from "./components/PeriodicTable";
 import { lightTheme } from "./theme";
 import { fillDrinkData } from "./utils/fillDrinkData";
 
-const filledDrinkData = fillDrinkData(drinkData);
+type ListSelection = "random" | number;
 
 export default function App() {
 	const [viewMode, setViewMode] = useState<"full" | "compact">("compact");
 	const [selectedDrink, setSelectedDrink] = useState<DrinkCellProps | null>(null);
 	const [panelVisible, setPanelVisible] = useState(true);
 	const [panelCollapsed, setPanelCollapsed] = useState(false);
+	const [listSelection, setListSelection] = useState<ListSelection>(0);
+
+	const filledDrinkData = useMemo(() => {
+		if (listSelection === "random") return fillDrinkData([], true);
+		return fillDrinkData(drinkLists[listSelection].drinks, false);
+	}, [listSelection]);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -48,6 +54,8 @@ export default function App() {
 					onViewModeChange={setViewMode}
 					collapsed={panelCollapsed}
 					onCollapseToggle={() => setPanelCollapsed((c) => !c)}
+					listSelection={listSelection}
+					onListChange={setListSelection}
 				/>
 			)}
 		</ThemeProvider>

@@ -1,5 +1,5 @@
 import type { DrinkCellProps } from '../components/DrinkCell'
-import type { DrinkProps } from '../types/drink'
+import type { DrinkList, DrinkProps } from '../types/drink'
 
 type DefaultCellData = Pick<DrinkCellProps, 'row' | 'col' | 'group'>
 
@@ -126,37 +126,6 @@ export const defaultCells: DefaultCellData[] = [
   { row: 7, col: 16, group: 'post_transition_metals' },
   { row: 7, col: 17, group: 'halogens' },
   { row: 7, col: 18, group: 'noble_gases' },
-  // // Row 8 is a blank separator row — no cells
-  // { row: 9, col: 3, group: 'lanthanides' },
-  // { row: 9, col: 4, group: 'lanthanides' },
-  // { row: 9, col: 5, group: 'lanthanides' },
-  // { row: 9, col: 6, group: 'lanthanides' },
-  // { row: 9, col: 7, group: 'lanthanides' },
-  // { row: 9, col: 8, group: 'lanthanides' },
-  // { row: 9, col: 9, group: 'lanthanides' },
-  // { row: 9, col: 10, group: 'lanthanides' },
-  // { row: 9, col: 11, group: 'lanthanides' },
-  // { row: 9, col: 12, group: 'lanthanides' },
-  // { row: 9, col: 13, group: 'lanthanides' },
-  // { row: 9, col: 14, group: 'lanthanides' },
-  // { row: 9, col: 15, group: 'lanthanides' },
-  // { row: 9, col: 16, group: 'lanthanides' },
-  // { row: 9, col: 17, group: 'lanthanides' },
-  // { row: 10, col: 3, group: 'actinides' },
-  // { row: 10, col: 4, group: 'actinides' },
-  // { row: 10, col: 5, group: 'actinides' },
-  // { row: 10, col: 6, group: 'actinides' },
-  // { row: 10, col: 7, group: 'actinides' },
-  // { row: 10, col: 8, group: 'actinides' },
-  // { row: 10, col: 9, group: 'actinides' },
-  // { row: 10, col: 10, group: 'actinides' },
-  // { row: 10, col: 11, group: 'actinides' },
-  // { row: 10, col: 12, group: 'actinides' },
-  // { row: 10, col: 13, group: 'actinides' },
-  // { row: 10, col: 14, group: 'actinides' },
-  // { row: 10, col: 15, group: 'actinides' },
-  // { row: 10, col: 16, group: 'actinides' },
-  // { row: 10, col: 17, group: 'actinides' },
 ]
 
 export const defaultCellMap = new Map(
@@ -1621,4 +1590,8 @@ export const drinkData: DrinkProps[] = [
     instructions: ['Shake and strain'],
     atomic_number: 103,
   },
+]
+
+export const drinkLists: DrinkList[] = [
+  { title: 'The Dr. Mitchell Special', drinks: drinkData },
 ]

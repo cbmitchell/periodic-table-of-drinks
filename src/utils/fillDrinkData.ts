@@ -6,7 +6,7 @@ import type { DrinkCellProps } from '../components/DrinkCell'
 import type { DrinkProps } from '../types/drink'
 import { generateRandomDrink } from './randomizers'
 
-export function fillDrinkData(drinks: DrinkProps[]): DrinkCellProps[] {
+export function fillDrinkData(drinks: DrinkProps[], randomFill: boolean): DrinkCellProps[] {
   const drinkByAtomicNumber = new Map(
     drinks
       .filter(
@@ -16,14 +16,12 @@ export function fillDrinkData(drinks: DrinkProps[]): DrinkCellProps[] {
       .map((d) => [d.atomic_number, d]),
   )
 
-  return defaultCells.map((defaultCell, index) => {
-    const drinkItem = drinkByAtomicNumber.get(index + 1)
-    if (drinkItem) {
-      return { ...defaultCell, ...drinkItem }
-    }
-    return {
-      ...generateRandomDrink(),
-      ...defaultCell,
-    }
-  })
+  return defaultCells
+    .map((defaultCell, index) => {
+      const drinkItem = drinkByAtomicNumber.get(index + 1)
+      if (drinkItem) return { ...defaultCell, ...drinkItem }
+      if (randomFill) return { ...generateRandomDrink(), ...defaultCell }
+      return null
+    })
+    .filter((d): d is DrinkCellProps => d !== null)
 }
