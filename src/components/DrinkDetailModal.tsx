@@ -8,7 +8,12 @@ interface DrinkDetailModalProps {
 
 export function DrinkDetailModal({ drink, onClose }: DrinkDetailModalProps) {
   return (
-    <Dialog open={drink !== null} onClose={onClose} maxWidth={false}>
+    <Dialog
+      open={drink !== null}
+      onClose={onClose}
+      maxWidth={false}
+      aria-label={drink?.title ?? 'Drink details'}
+    >
       <DialogContent sx={{ p: 0 }}>
         {drink && <DrinkCell {...drink} compact={false} onClick={undefined} />}
       </DialogContent>

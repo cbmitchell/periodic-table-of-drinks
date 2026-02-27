@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import {
   CELL_HEIGHT,
   CELL_WIDTH,
@@ -33,7 +33,7 @@ interface PeriodicTableProps {
   onDrinkClick?: (drink: DrinkCellProps) => void
 }
 
-export function PeriodicTable({
+export const PeriodicTable = memo(function PeriodicTable({
   drinks,
   viewMode,
   onDrinkClick,
@@ -195,4 +195,4 @@ export function PeriodicTable({
   }
 
   return <Box sx={{ width: '100%', height: '100vh' }}>{grid}</Box>
-}
+})

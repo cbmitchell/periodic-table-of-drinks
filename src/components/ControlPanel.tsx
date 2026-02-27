@@ -15,8 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import { drinkLists } from "../assets/drinkData";
-
-type ListSelection = "random" | number;
+import type { ListSelection } from "../types/ListSelection";
 
 interface ControlPanelProps {
   viewMode: "full" | "compact";

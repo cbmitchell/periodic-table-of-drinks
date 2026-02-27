@@ -12,16 +12,6 @@ import {
   randomTitleParts,
 } from './randomizerParts'
 
-function weightedRandom(thresholds: number[]): number {
-  const total = thresholds.reduce((sum, t) => sum + t, 0)
-  let r = Math.random() * total
-  for (let i = 0; i < thresholds.length; i++) {
-    r -= thresholds[i]
-    if (r <= 0) return i
-  }
-  return thresholds.length - 1 // fallback for floating point edge cases
-}
-
 const randomAmount = () => {
   const quantity = new WeightedList(
     randomAmountParts.quantity,
@@ -35,28 +25,52 @@ const randomAmount = () => {
 export const generateRandomIngredients = (): string[] => {
   const ingredientsList: string[] = []
 
-  const possibleNumSpirits = [1, 2, 3, 4]
-  const numSpirits = possibleNumSpirits[weightedRandom([75, 20, 4, 1])]
+  const numSpirits = new WeightedList([
+    { value: 1, likelihood: 75 },
+    { value: 2, likelihood: 20 },
+    { value: 3, likelihood: 4 },
+    { value: 4, likelihood: 1 },
+  ]).randomlySelectItem()
   const spirits = new WeightedList(randomIngredientParts.spirit)
     .randomlySelectNDistinctItems(numSpirits)
     .map((s) => `${randomAmount()} ${s}`)
 
-  const numMixers = weightedRandom([35, 40, 15, 10])
+  const numMixers = new WeightedList([
+    { value: 0, likelihood: 35 },
+    { value: 1, likelihood: 40 },
+    { value: 2, likelihood: 15 },
+    { value: 3, likelihood: 10 },
+  ]).randomlySelectItem()
   const mixers = new WeightedList(randomIngredientParts.mixer)
     .randomlySelectNDistinctItems(numMixers)
     .map((m) => `${randomAmount()} ${m}`)
 
-  const numFlavors = weightedRandom([30, 50, 15, 5])
+  const numFlavors = new WeightedList([
+    { value: 0, likelihood: 30 },
+    { value: 1, likelihood: 50 },
+    { value: 2, likelihood: 15 },
+    { value: 3, likelihood: 5 },
+  ]).randomlySelectItem()
   const flavors = new WeightedList(randomIngredientParts.flavor)
     .randomlySelectNDistinctItems(numFlavors)
     .map((f) => `${randomAmount()} ${f}`)
 
-  const numMouthfeels = weightedRandom([60, 30, 8, 2])
+  const numMouthfeels = new WeightedList([
+    { value: 0, likelihood: 60 },
+    { value: 1, likelihood: 30 },
+    { value: 2, likelihood: 8 },
+    { value: 3, likelihood: 2 },
+  ]).randomlySelectItem()
   const mouthfeels = new WeightedList(
     randomIngredientParts.mouthfeel,
   ).randomlySelectNDistinctItems(numMouthfeels)
 
-  const numGarnishes = weightedRandom([50, 40, 7, 3])
+  const numGarnishes = new WeightedList([
+    { value: 0, likelihood: 50 },
+    { value: 1, likelihood: 40 },
+    { value: 2, likelihood: 7 },
+    { value: 3, likelihood: 3 },
+  ]).randomlySelectItem()
   const garnishes = new WeightedList(
     randomIngredientParts.garnish,
   ).randomlySelectNDistinctItems(numGarnishes)
@@ -77,18 +91,21 @@ const generateRandomInstructions = (): string[] => {
     randomInstructionParts.prepare,
   ).randomlySelectNDistinctItems(MAX_PREPARATIONS)
 
-  if (Math.random() < 0.3 && preparations.length > 0) {
-    instructions.push(preparations.shift()!)
+  if (Math.random() < 0.3) {
+    const prep = preparations.shift()
+    if (prep !== undefined) instructions.push(prep)
   }
-  if (Math.random() < 0.07 && preparations.length > 0) {
-    instructions.push(preparations.shift()!)
+  if (Math.random() < 0.07) {
+    const prep = preparations.shift()
+    if (prep !== undefined) instructions.push(prep)
   }
   const combineItem = WeightedList.from<CombinePart>(
     randomInstructionParts.combine,
   ).randomlySelectItem()
   instructions.push(combineItem.text)
-  if (Math.random() < 0.1 && preparations.length > 0) {
-    instructions.push(preparations.shift()!)
+  if (Math.random() < 0.1) {
+    const prep = preparations.shift()
+    if (prep !== undefined) instructions.push(prep)
   }
   if (Math.random() < 0.8) {
     const mixPool = combineItem.allowedMix ?? randomInstructionParts.mix
@@ -101,8 +118,9 @@ const generateRandomInstructions = (): string[] => {
     }
     instructions.push(mix)
   }
-  if (Math.random() < 0.1 && preparations.length > 0) {
-    instructions.push(preparations.shift()!)
+  if (Math.random() < 0.1) {
+    const prep = preparations.shift()
+    if (prep !== undefined) instructions.push(prep)
   }
   if (Math.random() < 0.3) {
     instructions.push(
@@ -168,11 +186,8 @@ function firstLetters(str: string): string {
 function twoChars(str: string): string {
   if (str.length === 0) return ''
   const first = str[0].toUpperCase()
-  const second = str
-    .split('')
-    .slice(1)
-    .find((c) => /[A-Z]/.test(c))
-  return first + (second ? second.toLowerCase() : '')
+  const second = str.slice(1).match(/[A-Z]/)?.[0]?.toLowerCase() ?? ''
+  return first + second
 }
 
 function generateAbbreviation(title: string) {

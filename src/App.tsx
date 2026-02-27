@@ -5,11 +5,11 @@ import { drinkLists } from './assets/drinkData'
 import { ControlPanel } from './components/ControlPanel'
 import type { DrinkCellProps } from './components/DrinkCell'
 import { DrinkDetailModal } from './components/DrinkDetailModal'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { PeriodicTable, FULL_TABLE_WIDTH } from './components/PeriodicTable'
 import { darkTheme, lightTheme } from './theme'
+import type { ListSelection } from './types/ListSelection'
 import { fillDrinkData } from './utils/fillDrinkData'
-
-type ListSelection = 'random' | number
 
 export default function App() {
   const [viewMode, setViewMode] = useState<'full' | 'compact'>('compact')
@@ -28,11 +28,14 @@ export default function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.code === 'Space' &&
-        !(e.target instanceof HTMLInputElement) &&
-        !(e.target instanceof HTMLTextAreaElement)
-      ) {
+      const target = e.target as HTMLElement
+      const isInteractive =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        target instanceof HTMLButtonElement ||
+        target.isContentEditable
+      if (e.code === 'Space' && !isInteractive) {
         e.preventDefault()
         setPanelVisible((v) => !v)
       }
@@ -67,11 +70,13 @@ export default function App() {
       >
         Periodic Table of Drinks
       </Typography>
-      <PeriodicTable
-        drinks={filledDrinkData}
-        viewMode={viewMode}
-        onDrinkClick={setSelectedDrink}
-      />
+      <ErrorBoundary>
+        <PeriodicTable
+          drinks={filledDrinkData}
+          viewMode={viewMode}
+          onDrinkClick={setSelectedDrink}
+        />
+      </ErrorBoundary>
       <DrinkDetailModal
         drink={selectedDrink}
         onClose={() => setSelectedDrink(null)}
