@@ -4,6 +4,7 @@ import {
   Button,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   Grow,
   IconButton,
   InputLabel,
@@ -85,6 +86,9 @@ export function ControlPanel({
                 </MenuItem>
               ))}
             </Select>
+            <FormHelperText>
+              {drinkLists[listSelection]?.description?.trim()}
+            </FormHelperText>
           </FormControl>
           <Button
             variant="contained"
