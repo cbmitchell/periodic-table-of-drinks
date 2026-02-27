@@ -3,19 +3,24 @@
 
 import { defaultCells } from "../assets/drinkData";
 import type { DrinkCellProps } from "../components/DrinkCell";
+import type { DrinkProps } from "../types/drink";
 import { generateRandomDrink } from "./randomizers";
 
-export function fillDrinkData(drinks: DrinkCellProps[]): DrinkCellProps[] {
-  const drinkMap = new Map(drinks.map(d => [`${d.row},${d.col}`, d]))
+export function fillDrinkData(drinks: DrinkProps[]): DrinkCellProps[] {
+  const drinkByAtomicNumber = new Map(
+    drinks
+      .filter((d): d is DrinkProps & { atomic_number: number } => d.atomic_number != null)
+      .map(d => [d.atomic_number, d])
+  )
 
-  return defaultCells.map(defaultCell => {
-    const existing = drinkMap.get(`${defaultCell.row},${defaultCell.col}`)
-    if (existing) return existing
+  return defaultCells.map((defaultCell, index) => {
+    const drinkItem = drinkByAtomicNumber.get(index + 1)
+    if (drinkItem) {
+      return { ...drinkItem, ...defaultCell }
+    }
     return {
       ...generateRandomDrink(),
-      group: defaultCell.group,
-      row: defaultCell.row,
-      col: defaultCell.col,
+      ...defaultCell,
     }
   })
 }

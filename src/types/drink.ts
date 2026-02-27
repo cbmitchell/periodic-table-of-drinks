@@ -26,4 +26,5 @@ export interface DrinkProps {
   ingredients: string[]
   instructions: string[]
   group?: ElementGroup
+  atomic_number?: number
 }
