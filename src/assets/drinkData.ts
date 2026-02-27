@@ -1598,6 +1598,7 @@ export const drinkLists: DrinkList[] = [
     description: `A whole table of drinks carefully compiled and assembled by 
     Andrew Mitchell, radiochemist & mixologist extraordinaire.`,
     drinks: drinkData,
+    path: 'mitchell',
   },
   {
     title: 'Randomized Nonsense',
@@ -1605,5 +1606,6 @@ export const drinkLists: DrinkList[] = [
     the page is reloaded. Drink these at your own risk.`,
     drinks: [],
     isRandom: true,
-  }
+    path: 'random',
+  },
 ]

@@ -25,15 +25,28 @@ export default function App() {
 		"ptod_panel_collapsed",
 		false,
 	);
-	const [listSelection, setListSelection] = useSessionStorage<ListSelection>(
-		"ptod_list_selection",
-		0,
-	);
+	const [listSelection, setListSelection] = useState<ListSelection>(() => {
+		const params = new URLSearchParams(window.location.search);
+		const list = params.get("list");
+		if (list !== null) {
+			const pathIdx = drinkLists.findIndex((l) => l.path === list);
+			if (pathIdx !== -1) return pathIdx;
+			const idx = Number(list);
+			if (!Number.isNaN(idx) && idx >= 0 && idx < drinkLists.length) return idx;
+		}
+		return 0;
+	});
 	const [darkMode, setDarkMode] = useSessionStorage("ptod_dark_mode", false);
 
 	const filledDrinkData = useMemo(() => {
 		const list = drinkLists[listSelection];
 		return fillDrinkData(list.drinks, !!list.isRandom);
+	}, [listSelection]);
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		params.set("list", drinkLists[listSelection].path ?? String(listSelection));
+		window.history.replaceState(null, "", `?${params}`);
 	}, [listSelection]);
 
 	useEffect(() => {
