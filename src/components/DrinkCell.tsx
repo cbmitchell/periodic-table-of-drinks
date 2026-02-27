@@ -74,10 +74,10 @@ export const DrinkCell = memo(function DrinkCell({
   const height = compact ? COMPACT_CELL_HEIGHT : CELL_HEIGHT
   const baseColor = elementGroupColors[group]
   const backgroundColor = isDark
-    ? `color-mix(in srgb, ${baseColor}, #303030 65%)`
+    ? `color-mix(in srgb, ${baseColor}, #000000 55%)`
     : baseColor
   const iconColor = isDark ? 'white' : 'black'
-  const saturation = isDark ? '200%' : '100%'
+  const saturation = isDark ? '250%' : '100%'
 
   return (
     <Card
@@ -100,7 +100,9 @@ export const DrinkCell = memo(function DrinkCell({
         {compact ? (
           <Grid container spacing={0}>
             <Grid size={8}>
-              <Box sx={{ position: 'relative', height: COMPACT_CONTENT_HEIGHT }}>
+              <Box
+                sx={{ position: 'relative', height: COMPACT_CONTENT_HEIGHT }}
+              >
                 <Typography
                   sx={{
                     fontSize: LIST_ITEM_FONT_SIZE,
@@ -166,7 +168,11 @@ export const DrinkCell = memo(function DrinkCell({
                 src={`glass-icons/${iconColor}/${icon}.png`}
                 alt={`${icon} glass`}
                 onError={hideOnError}
-                sx={{ height: FULL_IMAGE_HEIGHT, position: 'absolute', bottom: 0 }}
+                sx={{
+                  height: FULL_IMAGE_HEIGHT,
+                  position: 'absolute',
+                  bottom: 0,
+                }}
               />
             </Grid>
             <Grid size={6}>
@@ -177,7 +183,9 @@ export const DrinkCell = memo(function DrinkCell({
                       <ListItemText
                         sx={{ fontSize: 8, display: 'list-item', my: 0 }}
                         primary={ingredient}
-                        slotProps={{ primary: { sx: { fontSize: LIST_ITEM_FONT_SIZE } } }}
+                        slotProps={{
+                          primary: { sx: { fontSize: LIST_ITEM_FONT_SIZE } },
+                        }}
                       />
                     </ListItem>
                   ))}
@@ -192,7 +200,9 @@ export const DrinkCell = memo(function DrinkCell({
                       <ListItemText
                         sx={{ fontSize: 8, display: 'list-item', my: 0 }}
                         primary={instruction}
-                        slotProps={{ primary: { sx: { fontSize: LIST_ITEM_FONT_SIZE } } }}
+                        slotProps={{
+                          primary: { sx: { fontSize: LIST_ITEM_FONT_SIZE } },
+                        }}
                       />
                     </ListItem>
                   ))}
