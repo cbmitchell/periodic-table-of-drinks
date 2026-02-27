@@ -248,6 +248,7 @@ export const drinkData: DrinkProps[] = [
     ],
     instructions: ['Absinth Rinse Glass', 'Shake and Strain'],
     atomic_number: 4,
+    group: 'alkali_metals',
   },
   {
     title: 'The Last Word',
@@ -261,6 +262,7 @@ export const drinkData: DrinkProps[] = [
     ],
     instructions: ['Shake and Strain'],
     atomic_number: 12,
+    group: 'alkali_metals',
   },
   {
     title: 'Tom collins',
@@ -274,6 +276,7 @@ export const drinkData: DrinkProps[] = [
       'Garnish with lemon wheel',
     ],
     atomic_number: 20,
+    group: 'alkali_metals',
   },
   {
     title: 'Vesper',
@@ -282,6 +285,7 @@ export const drinkData: DrinkProps[] = [
     ingredients: ['3 oz Gin', '1 oz Vodka', '½ oz Lillet Blank'],
     instructions: ['Shake and Strain', 'Garnish with Lemon Twist'],
     atomic_number: 38,
+    group: 'alkali_metals',
   },
   {
     title: 'Singapore Sling',
@@ -303,6 +307,7 @@ export const drinkData: DrinkProps[] = [
       'Garnish with Orange Slice and Cherry',
     ],
     atomic_number: 56,
+    group: 'alkali_metals',
   },
   {
     title: 'Gin Rickey',
@@ -315,6 +320,7 @@ export const drinkData: DrinkProps[] = [
       'Garnish with Lime Wheel',
     ],
     atomic_number: 88,
+    group: 'alkali_metals',
   },
   {
     title: 'Whiskey Cobbler',
@@ -759,6 +765,7 @@ export const drinkData: DrinkProps[] = [
       'Garnish with Berries and Lime Wedge',
     ],
     atomic_number: 30,
+    group: 'post_transition_metals',
   },
   {
     title: 'Mojito',
@@ -779,6 +786,7 @@ export const drinkData: DrinkProps[] = [
       'Garnish with Mint sprig',
     ],
     atomic_number: 48,
+    group: 'post_transition_metals',
   },
   {
     title: 'Fog Cutter',
@@ -798,6 +806,7 @@ export const drinkData: DrinkProps[] = [
       'Float Sherry',
     ],
     atomic_number: 80,
+    group: 'post_transition_metals',
   },
   {
     title: 'Hurricane',
@@ -814,6 +823,7 @@ export const drinkData: DrinkProps[] = [
     ],
     instructions: ['Shake and Strain over crushed Ice'],
     atomic_number: 112,
+    group: 'post_transition_metals',
   },
   {
     title: 'Bahama Mama',
@@ -987,6 +997,7 @@ export const drinkData: DrinkProps[] = [
       'Top with Soda',
     ],
     atomic_number: 84,
+    group: 'post_transition_metals',
   },
   {
     title: 'Rum Punch',
@@ -1002,6 +1013,7 @@ export const drinkData: DrinkProps[] = [
     ],
     instructions: ['Shake and Strain over Ice', 'Garnish with Cherry'],
     atomic_number: 117,
+    group: 'post_transition_metals',
   },
   {
     title: 'Frozen Margarita',
@@ -1100,6 +1112,7 @@ export const drinkData: DrinkProps[] = [
       'Garnish with Whipped Cream',
     ],
     atomic_number: 85,
+    group: 'metalloids',
   },
   {
     title: 'Tequila Sunrise',
@@ -1153,6 +1166,7 @@ export const drinkData: DrinkProps[] = [
     ],
     instructions: ['Rim glass with Salt', 'Build over Ice'],
     atomic_number: 9,
+    group: 'nonmetals',
   },
   {
     title: 'Ranch Water',
@@ -1192,6 +1206,7 @@ export const drinkData: DrinkProps[] = [
       'Garnish with Lime Wedge',
     ],
     atomic_number: 17,
+    group: 'nonmetals',
   },
   {
     title: 'Mexican Firing Squad',
@@ -1219,6 +1234,7 @@ export const drinkData: DrinkProps[] = [
     ],
     instructions: ['Muddle Jal and Watermelon', 'Shake all', 'Strain over Ice'],
     atomic_number: 35,
+    group: 'nonmetals',
   },
   {
     title: 'Spicy Margarita',
@@ -1238,6 +1254,7 @@ export const drinkData: DrinkProps[] = [
       'Strain over Ice',
     ],
     atomic_number: 53,
+    group: 'nonmetals',
   },
   {
     title: 'Screwdriver',
