@@ -141,7 +141,7 @@ const generateRandomTitle = (): string => {
     new WeightedList(randomTitleParts.noun).randomlySelectItem(),
   )
 
-  let secondaryNounThreshold = 0.85
+  let secondaryNounThreshold = 0.9
   if (adverbPresent) {
     secondaryNounThreshold = 0.1
   } else if (adjectivePresent) {
