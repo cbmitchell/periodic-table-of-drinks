@@ -1,1 +1,1 @@
-export type ListSelection = 'random' | number
+export type ListSelection = number

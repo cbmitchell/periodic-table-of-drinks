@@ -32,5 +32,7 @@ export interface DrinkProps {
 
 export interface DrinkList {
   title: string
+  description?: string
   drinks: DrinkProps[]
+  isRandom?: boolean
 }

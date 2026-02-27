@@ -1593,5 +1593,17 @@ export const drinkData: DrinkProps[] = [
 ]
 
 export const drinkLists: DrinkList[] = [
-  { title: 'The Dr. Mitchell Special', drinks: drinkData },
+  {
+    title: 'The Dr. Mitchell Special',
+    description: `A whole table of drinks carefully compiled and assembled by 
+    Andrew Mitchell, radiochemist & mixologist extraordinaire.`,
+    drinks: drinkData,
+  },
+  {
+    title: 'Randomized Nonsense',
+    description: `Every cell of the table is completely randomized each time
+    the page is reloaded. Drink these at your own risk.`,
+    drinks: [],
+    isRandom: true,
+  }
 ]

@@ -75,16 +75,10 @@ export function ControlPanel({
             <InputLabel>Drink List</InputLabel>
             <Select
               label="Drink List"
-              value={
-                listSelection === 'random' ? 'random' : String(listSelection)
-              }
+              value={String(listSelection)}
               MenuProps={{ sx: { zIndex: (theme) => theme.zIndex.modal + 2 } }}
-              onChange={(e) => {
-                const val = e.target.value
-                onListChange(val === 'random' ? 'random' : Number(val))
-              }}
+              onChange={(e) => onListChange(Number(e.target.value))}
             >
-              <MenuItem value="random">Random</MenuItem>
               {drinkLists.map((list, i) => (
                 <MenuItem key={list.title} value={String(i)}>
                   {list.title}

@@ -32,8 +32,8 @@ export default function App() {
 	const [darkMode, setDarkMode] = useSessionStorage("ptod_dark_mode", false);
 
 	const filledDrinkData = useMemo(() => {
-		if (listSelection === "random") return fillDrinkData([], true);
-		return fillDrinkData(drinkLists[listSelection].drinks, false);
+		const list = drinkLists[listSelection];
+		return fillDrinkData(list.drinks, !!list.isRandom);
 	}, [listSelection]);
 
 	useEffect(() => {
