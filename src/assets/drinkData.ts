@@ -171,6 +171,7 @@ export const drinkData: DrinkProps[] = [
     ingredients: ['2 atoms Carbon', '1 atom Oxygen', '6 atoms Hydrogen'],
     instructions: ['Ferment', 'Distill', 'Age', 'Enjoy'],
     atomic_number: 1,
+    group: 'actinides',
   },
   {
     title: 'Bees Knees',
@@ -552,7 +553,7 @@ export const drinkData: DrinkProps[] = [
   {
     title: 'Bourbon Punch',
     abbreviation: 'Bp',
-    icon: 'punch bowl',
+    icon: 'punch',
     ingredients: [
       '1 bottle Bourbon',
       '1 c Sweet Vermouth',
@@ -937,7 +938,7 @@ export const drinkData: DrinkProps[] = [
   {
     title: 'Dark n Stormy',
     abbreviation: 'Ds',
-    icon: 'pint',
+    icon: 'mule',
     ingredients: ['2 oz Dark Rum', '½ oz Lime', 'Ginger Beer'],
     instructions: ['Build over Ice'],
     atomic_number: 83,

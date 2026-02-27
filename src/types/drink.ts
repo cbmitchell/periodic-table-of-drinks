@@ -10,6 +10,7 @@ export const GLASS_TYPES = [
   'martini',
   'mule',
   'pint',
+  'punch',
   'rocks',
   'shot',
   'shooter',
