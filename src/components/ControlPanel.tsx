@@ -1,31 +1,29 @@
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CloseIcon from '@mui/icons-material/Close'
+import TuneIcon from '@mui/icons-material/Tune'
 import {
-  Box,
   Button,
-  Collapse,
   FormControl,
   FormControlLabel,
+  Grow,
   IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   Switch,
-  Typography,
-} from "@mui/material";
-import { drinkLists } from "../assets/drinkData";
-import type { ListSelection } from "../types/ListSelection";
+} from '@mui/material'
+import { drinkLists } from '../assets/drinkData'
+import type { ListSelection } from '../types/ListSelection'
 
 interface ControlPanelProps {
-  viewMode: "full" | "compact";
-  onViewModeChange: (mode: "full" | "compact") => void;
-  collapsed: boolean;
-  onCollapseToggle: () => void;
-  listSelection: ListSelection;
-  onListChange: (selection: ListSelection) => void;
-  darkMode: boolean;
-  onDarkModeToggle: () => void;
+  viewMode: 'full' | 'compact'
+  onViewModeChange: (mode: 'full' | 'compact') => void
+  collapsed: boolean
+  onCollapseToggle: () => void
+  listSelection: ListSelection
+  onListChange: (selection: ListSelection) => void
+  darkMode: boolean
+  onDarkModeToggle: () => void
 }
 
 export function ControlPanel({
@@ -38,44 +36,52 @@ export function ControlPanel({
   darkMode,
   onDarkModeToggle,
 }: ControlPanelProps) {
+  const zIndex = (theme: { zIndex: { modal: number } }) => theme.zIndex.modal + 1
+
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        position: "fixed",
-        top: 16,
-        right: 16,
-        zIndex: (theme) => theme.zIndex.modal + 1,
-        minWidth: 220,
-      }}
-    >
-      <Box
+    <>
+      <IconButton
+        onClick={onCollapseToggle}
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
-          py: 1,
+          position: 'fixed',
+          top: 16,
+          right: 16,
+          zIndex,
+          bgcolor: 'background.paper',
+          boxShadow: 3,
+          borderRadius: 1,
+          '&:hover': { bgcolor: 'background.paper' },
         }}
       >
-        <Typography variant="subtitle2" fontWeight="bold">
-          Controls
-        </Typography>
-        <IconButton size="small" onClick={onCollapseToggle}>
-          {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
-      </Box>
-      <Collapse in={!collapsed}>
-        <Box sx={{ px: 2, pb: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+        {collapsed ? <TuneIcon /> : <CloseIcon />}
+      </IconButton>
+
+      <Grow in={!collapsed} unmountOnExit style={{ transformOrigin: 'top right' }}>
+        <Paper
+          elevation={3}
+          sx={{
+            position: 'fixed',
+            top: 56,
+            right: 16,
+            zIndex,
+            width: 220,
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
           <FormControl size="small" fullWidth>
             <InputLabel>Drink List</InputLabel>
             <Select
               label="Drink List"
-              value={listSelection === "random" ? "random" : String(listSelection)}
+              value={
+                listSelection === 'random' ? 'random' : String(listSelection)
+              }
               MenuProps={{ sx: { zIndex: (theme) => theme.zIndex.modal + 2 } }}
               onChange={(e) => {
-                const val = e.target.value;
-                onListChange(val === "random" ? "random" : Number(val));
+                const val = e.target.value
+                onListChange(val === 'random' ? 'random' : Number(val))
               }}
             >
               <MenuItem value="random">Random</MenuItem>
@@ -90,10 +96,10 @@ export function ControlPanel({
             variant="contained"
             fullWidth
             onClick={() =>
-              onViewModeChange(viewMode === "compact" ? "full" : "compact")
+              onViewModeChange(viewMode === 'compact' ? 'full' : 'compact')
             }
           >
-            {viewMode === "compact" ? "Full View" : "Compact View"}
+            {viewMode === 'compact' ? 'Full View' : 'Compact View'}
           </Button>
           <FormControlLabel
             control={
@@ -106,8 +112,8 @@ export function ControlPanel({
             label="Dark Mode"
             sx={{ mx: 0 }}
           />
-        </Box>
-      </Collapse>
-    </Paper>
-  );
+        </Paper>
+      </Grow>
+    </>
+  )
 }
