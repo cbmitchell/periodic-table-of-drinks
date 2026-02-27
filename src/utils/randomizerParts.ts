@@ -54,7 +54,7 @@ export const randomTitleParts: Record<TitlePart, WeightedItem<string>[]> = {
     { value: 'Secretly' },
     { value: 'Unfortunately', likelihood: 1.2 },
     { value: 'Memory of a' },
-    { value: 'The', likelihood: 3 },
+    { value: 'The', likelihood: 5 },
     { value: 'Most' },
     { value: 'Surprisingly' },
     { value: 'Foolishly' },
@@ -339,6 +339,7 @@ export const randomTitleParts: Record<TitlePart, WeightedItem<string>[]> = {
     { value: 'Unfair' },
     { value: 'Moscow' },
     { value: 'London' },
+    { value: 'Sensitive' },
   ],
   noun: [
     { value: 'Explosion' },
@@ -616,6 +617,8 @@ export const randomTitleParts: Record<TitlePart, WeightedItem<string>[]> = {
     { value: 'Fog' },
     { value: 'Invasion' },
     { value: 'Company' },
+    { value: 'Magician' },
+    { value: 'Wizard' },
   ],
   secondary_noun: [
     { value: 'Exploder' },
