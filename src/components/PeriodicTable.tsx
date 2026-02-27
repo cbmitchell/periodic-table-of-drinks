@@ -125,12 +125,11 @@ export const PeriodicTable = memo(function PeriodicTable({
       </Typography>
 
       {/* Row numbers — placed just to the left of each row's first cell.
-			    Row 8 is the empty gap before lanthanides/actinides and is skipped;
-			    rows 9 and 10 are displayed as 8 and 9. */}
+			    Rows 8–10 (the gap row and lanthanides/actinides) are skipped. */}
       {Array.from({ length: 10 }, (_, i) => {
         const row = i + 1
-        if (row === 8) return null
-        const displayNum = row < 8 ? row : row - 1
+        if (row >= 8) return null
+        const displayNum = row
         const minCol = minColByRow[row]
         if (minCol === undefined) return null
         return (
