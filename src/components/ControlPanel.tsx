@@ -5,11 +5,13 @@ import {
   Button,
   Collapse,
   FormControl,
+  FormControlLabel,
   IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
+  Switch,
   Typography,
 } from "@mui/material";
 import { drinkLists } from "../assets/drinkData";
@@ -23,6 +25,8 @@ interface ControlPanelProps {
   onCollapseToggle: () => void;
   listSelection: ListSelection;
   onListChange: (selection: ListSelection) => void;
+  darkMode: boolean;
+  onDarkModeToggle: () => void;
 }
 
 export function ControlPanel({
@@ -32,6 +36,8 @@ export function ControlPanel({
   onCollapseToggle,
   listSelection,
   onListChange,
+  darkMode,
+  onDarkModeToggle,
 }: ControlPanelProps) {
   return (
     <Paper
@@ -90,6 +96,17 @@ export function ControlPanel({
           >
             {viewMode === "compact" ? "Full View" : "Compact View"}
           </Button>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={darkMode}
+                onChange={onDarkModeToggle}
+                size="small"
+              />
+            }
+            label="Dark Mode"
+            sx={{ mx: 0 }}
+          />
         </Box>
       </Collapse>
     </Paper>

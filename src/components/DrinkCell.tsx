@@ -8,6 +8,7 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import type { ElementGroup } from '../types/ElementGroup'
 import type { DrinkProps } from '../types/drink'
 
@@ -52,8 +53,16 @@ export function DrinkCell({
   compact = false,
   onClick,
 }: DrinkCellProps) {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
   const width = compact ? COMPACT_CELL_WIDTH : CELL_WIDTH
   const height = compact ? COMPACT_CELL_HEIGHT : CELL_HEIGHT
+  const baseColor = elementGroupColors[group]
+  const backgroundColor = isDark
+    ? `color-mix(in srgb, ${baseColor}, #303030 65%)`
+    : baseColor
+  const iconColor = isDark ? 'white' : 'black'
+  const saturation = isDark ? '200%' : '100%'
 
   return (
     <Card
@@ -61,7 +70,8 @@ export function DrinkCell({
       sx={{
         width,
         height,
-        backgroundColor: elementGroupColors[group],
+        backgroundColor,
+        filter: `saturate(${saturation})`,
         gridRow: row,
         gridColumn: col,
         overflow: 'hidden',
@@ -102,7 +112,7 @@ export function DrinkCell({
             <Grid size={4} sx={{ position: 'relative' }}>
               <Box
                 component="img"
-                src={`glass-icons/black/${icon}.png`}
+                src={`glass-icons/${iconColor}/${icon}.png`}
                 sx={{ width: '100%', position: 'absolute', bottom: 0 }}
               />
             </Grid>
@@ -136,7 +146,7 @@ export function DrinkCell({
             <Grid size={4} sx={{ position: 'relative' }}>
               <Box
                 component="img"
-                src={`glass-icons/black/${icon}.png`}
+                src={`glass-icons/${iconColor}/${icon}.png`}
                 sx={{ height: '85%', position: 'absolute', bottom: 0 }}
               ></Box>
             </Grid>

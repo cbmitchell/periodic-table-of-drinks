@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material'
+import { CssBaseline, Typography } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { useEffect, useMemo, useState } from 'react'
 import { drinkLists } from './assets/drinkData'
@@ -6,7 +6,7 @@ import { ControlPanel } from './components/ControlPanel'
 import type { DrinkCellProps } from './components/DrinkCell'
 import { DrinkDetailModal } from './components/DrinkDetailModal'
 import { PeriodicTable, FULL_TABLE_WIDTH } from './components/PeriodicTable'
-import { lightTheme } from './theme'
+import { darkTheme, lightTheme } from './theme'
 import { fillDrinkData } from './utils/fillDrinkData'
 
 type ListSelection = 'random' | number
@@ -19,6 +19,7 @@ export default function App() {
   const [panelVisible, setPanelVisible] = useState(true)
   const [panelCollapsed, setPanelCollapsed] = useState(false)
   const [listSelection, setListSelection] = useState<ListSelection>(0)
+  const [darkMode, setDarkMode] = useState(false)
 
   const filledDrinkData = useMemo(() => {
     if (listSelection === 'random') return fillDrinkData([], true)
@@ -41,7 +42,8 @@ export default function App() {
   }, [])
 
   return (
-    <ThemeProvider theme={lightTheme}>
+    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+      <CssBaseline />
       <Typography
         variant="h4"
         sx={{
@@ -82,6 +84,8 @@ export default function App() {
           onCollapseToggle={() => setPanelCollapsed((c) => !c)}
           listSelection={listSelection}
           onListChange={setListSelection}
+          darkMode={darkMode}
+          onDarkModeToggle={() => setDarkMode((d) => !d)}
         />
       )}
     </ThemeProvider>
