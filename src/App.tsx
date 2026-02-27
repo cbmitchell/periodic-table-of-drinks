@@ -1,4 +1,4 @@
-import { CssBaseline, Typography } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { useEffect, useMemo, useState } from "react";
 import { drinkLists } from "./assets/drinkData";
@@ -6,7 +6,7 @@ import { ControlPanel } from "./components/ControlPanel";
 import type { DrinkCellProps } from "./components/DrinkCell";
 import { DrinkDetailModal } from "./components/DrinkDetailModal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { FULL_TABLE_WIDTH, PeriodicTable } from "./components/PeriodicTable";
+import { PeriodicTable } from "./components/PeriodicTable";
 import { darkTheme, lightTheme } from "./theme";
 import type { ListSelection } from "./types/ListSelection";
 import { fillDrinkData } from "./utils/fillDrinkData";
@@ -70,29 +70,6 @@ export default function App() {
 	return (
 		<ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
 			<CssBaseline />
-			<Typography
-				variant="h4"
-				sx={{
-					textAlign: "center",
-					fontWeight: "bold",
-					...(viewMode === "compact"
-						? {
-								position: "fixed",
-								top: 16,
-								left: 0,
-								right: 0,
-								zIndex: 10,
-								pointerEvents: "none",
-							}
-						: {
-								width: FULL_TABLE_WIDTH,
-								pt: 2,
-								pb: 1,
-							}),
-				}}
-			>
-				Periodic Table of Drinks
-			</Typography>
 			<ErrorBoundary>
 				<PeriodicTable
 					drinks={filledDrinkData}

@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { memo, useEffect, useMemo, useState } from 'react'
 import {
   CELL_HEIGHT,
@@ -12,11 +12,12 @@ import {
 const GAP_PX = 4 // MUI gap: 0.5 = 4px
 const COMPACT_LABEL_COL_W = 20 // width of row-number column in compact mode
 const COMPACT_LABEL_ROW_H = 16 // height of column-number row in compact mode
+const COMPACT_TITLE_ROW_H = 64 // estimated height of the title row
 const COMPACT_TABLE_WIDTH =
   18 * COMPACT_CELL_WIDTH + 17 * GAP_PX + GAP_PX + COMPACT_LABEL_COL_W
 export const FULL_TABLE_WIDTH = 18 * CELL_WIDTH + 17 * GAP_PX
 const COMPACT_TABLE_HEIGHT =
-  10 * COMPACT_CELL_HEIGHT + 9 * GAP_PX + GAP_PX + COMPACT_LABEL_ROW_H
+  10 * COMPACT_CELL_HEIGHT + 9 * GAP_PX + GAP_PX + COMPACT_LABEL_ROW_H + GAP_PX + COMPACT_TITLE_ROW_H
 const SCALE_PADDING = 32
 
 function calculateScale(): number {
@@ -104,11 +105,25 @@ export const PeriodicTable = memo(function PeriodicTable({
     <Box
       sx={{
         display: 'inline-grid',
-        gridTemplateRows: `auto repeat(10, ${cellHeight}px)`,
+        gridTemplateRows: `auto auto repeat(10, ${cellHeight}px)`,
         gridTemplateColumns: `auto repeat(18, ${cellWidth}px)`,
         gap: 0.5,
       }}
     >
+      {/* Title — spans the full grid width in the first row */}
+      <Typography
+        variant="h2"
+        sx={{
+          gridRow: 1,
+          gridColumn: '1 / -1',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          py: 1,
+        }}
+      >
+        Periodic Table of Drinks
+      </Typography>
+
       {/* Row numbers — placed just to the left of each row's first cell.
 			    Row 8 is the empty gap before lanthanides/actinides and is skipped;
 			    rows 9 and 10 are displayed as 8 and 9. */}
@@ -123,7 +138,7 @@ export const PeriodicTable = memo(function PeriodicTable({
             key={`row-${row}`}
             sx={{
               ...labelSx,
-              gridRow: row + 1,
+              gridRow: row + 2,
               gridColumn: minCol,
               justifySelf: 'end',
               pr: 1,
@@ -144,7 +159,7 @@ export const PeriodicTable = memo(function PeriodicTable({
             key={`col-${col}`}
             sx={{
               ...labelSx,
-              gridRow: minRow,
+              gridRow: minRow + 1,
               gridColumn: col + 1,
               alignSelf: 'end',
             }}
@@ -159,7 +174,7 @@ export const PeriodicTable = memo(function PeriodicTable({
         <DrinkCell
           key={`${drink.row},${drink.col}`}
           {...drink}
-          row={drink.row + 1}
+          row={drink.row + 2}
           col={drink.col + 1}
           compact={isCompact}
           onClick={
