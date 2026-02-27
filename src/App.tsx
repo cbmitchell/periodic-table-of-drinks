@@ -1,98 +1,108 @@
-import { CssBaseline, Typography } from '@mui/material'
-import { ThemeProvider } from '@mui/material/styles'
-import { useEffect, useMemo, useState } from 'react'
-import { drinkLists } from './assets/drinkData'
-import { ControlPanel } from './components/ControlPanel'
-import type { DrinkCellProps } from './components/DrinkCell'
-import { DrinkDetailModal } from './components/DrinkDetailModal'
-import { ErrorBoundary } from './components/ErrorBoundary'
-import { PeriodicTable, FULL_TABLE_WIDTH } from './components/PeriodicTable'
-import { darkTheme, lightTheme } from './theme'
-import type { ListSelection } from './types/ListSelection'
-import { fillDrinkData } from './utils/fillDrinkData'
+import { CssBaseline, Typography } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import { useEffect, useMemo, useState } from "react";
+import { drinkLists } from "./assets/drinkData";
+import { ControlPanel } from "./components/ControlPanel";
+import type { DrinkCellProps } from "./components/DrinkCell";
+import { DrinkDetailModal } from "./components/DrinkDetailModal";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { FULL_TABLE_WIDTH, PeriodicTable } from "./components/PeriodicTable";
+import { darkTheme, lightTheme } from "./theme";
+import type { ListSelection } from "./types/ListSelection";
+import { fillDrinkData } from "./utils/fillDrinkData";
+import { useSessionStorage } from "./utils/useSessionStorage";
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<'full' | 'compact'>('compact')
-  const [selectedDrink, setSelectedDrink] = useState<DrinkCellProps | null>(
-    null,
-  )
-  const [panelVisible, setPanelVisible] = useState(true)
-  const [panelCollapsed, setPanelCollapsed] = useState(false)
-  const [listSelection, setListSelection] = useState<ListSelection>(0)
-  const [darkMode, setDarkMode] = useState(false)
+	const [viewMode, setViewMode] = useSessionStorage<"full" | "compact">(
+		"ptod_view_mode",
+		"compact",
+	);
+	const [selectedDrink, setSelectedDrink] = useState<DrinkCellProps | null>(
+		null,
+	);
+	const [panelVisible, setPanelVisible] = useState(true);
+	const [panelCollapsed, setPanelCollapsed] = useSessionStorage(
+		"ptod_panel_collapsed",
+		false,
+	);
+	const [listSelection, setListSelection] = useSessionStorage<ListSelection>(
+		"ptod_list_selection",
+		0,
+	);
+	const [darkMode, setDarkMode] = useSessionStorage("ptod_dark_mode", false);
 
-  const filledDrinkData = useMemo(() => {
-    if (listSelection === 'random') return fillDrinkData([], true)
-    return fillDrinkData(drinkLists[listSelection].drinks, false)
-  }, [listSelection])
+	const filledDrinkData = useMemo(() => {
+		if (listSelection === "random") return fillDrinkData([], true);
+		return fillDrinkData(drinkLists[listSelection].drinks, false);
+	}, [listSelection]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement
-      const isInteractive =
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        target instanceof HTMLSelectElement ||
-        target instanceof HTMLButtonElement ||
-        target.isContentEditable
-      if (e.code === 'Space' && !isInteractive) {
-        e.preventDefault()
-        setPanelVisible((v) => !v)
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			const target = e.target as HTMLElement;
+			const isInteractive =
+				target instanceof HTMLInputElement ||
+				target instanceof HTMLTextAreaElement ||
+				target instanceof HTMLSelectElement ||
+				target instanceof HTMLButtonElement ||
+				target.isContentEditable;
+			if (e.code === "Space" && !isInteractive) {
+				e.preventDefault();
+				setPanelVisible((v) => !v);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, []);
 
-  return (
-    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      <CssBaseline />
-      <Typography
-        variant="h4"
-        sx={{
-          textAlign: 'center',
-          fontWeight: 'bold',
-          ...(viewMode === 'compact'
-            ? {
-                position: 'fixed',
-                top: 16,
-                left: 0,
-                right: 0,
-                zIndex: 10,
-                pointerEvents: 'none',
-              }
-            : {
-                width: FULL_TABLE_WIDTH,
-                pt: 2,
-                pb: 1,
-              }),
-        }}
-      >
-        Periodic Table of Drinks
-      </Typography>
-      <ErrorBoundary>
-        <PeriodicTable
-          drinks={filledDrinkData}
-          viewMode={viewMode}
-          onDrinkClick={setSelectedDrink}
-        />
-      </ErrorBoundary>
-      <DrinkDetailModal
-        drink={selectedDrink}
-        onClose={() => setSelectedDrink(null)}
-      />
-      {panelVisible && (
-        <ControlPanel
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          collapsed={panelCollapsed}
-          onCollapseToggle={() => setPanelCollapsed((c) => !c)}
-          listSelection={listSelection}
-          onListChange={setListSelection}
-          darkMode={darkMode}
-          onDarkModeToggle={() => setDarkMode((d) => !d)}
-        />
-      )}
-    </ThemeProvider>
-  )
+	return (
+		<ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+			<CssBaseline />
+			<Typography
+				variant="h4"
+				sx={{
+					textAlign: "center",
+					fontWeight: "bold",
+					...(viewMode === "compact"
+						? {
+								position: "fixed",
+								top: 16,
+								left: 0,
+								right: 0,
+								zIndex: 10,
+								pointerEvents: "none",
+							}
+						: {
+								width: FULL_TABLE_WIDTH,
+								pt: 2,
+								pb: 1,
+							}),
+				}}
+			>
+				Periodic Table of Drinks
+			</Typography>
+			<ErrorBoundary>
+				<PeriodicTable
+					drinks={filledDrinkData}
+					viewMode={viewMode}
+					onDrinkClick={setSelectedDrink}
+				/>
+			</ErrorBoundary>
+			<DrinkDetailModal
+				drink={selectedDrink}
+				onClose={() => setSelectedDrink(null)}
+			/>
+			{panelVisible && (
+				<ControlPanel
+					viewMode={viewMode}
+					onViewModeChange={setViewMode}
+					collapsed={panelCollapsed}
+					onCollapseToggle={() => setPanelCollapsed(!panelCollapsed)}
+					listSelection={listSelection}
+					onListChange={setListSelection}
+					darkMode={darkMode}
+					onDarkModeToggle={() => setDarkMode(!darkMode)}
+				/>
+			)}
+		</ThemeProvider>
+	);
 }
