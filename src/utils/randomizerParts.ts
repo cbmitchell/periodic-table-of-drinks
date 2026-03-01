@@ -1,5 +1,63 @@
 import type { WeightedItem } from '../types/WeightedList'
 export type TitlePart = 'adverb' | 'adjective' | 'noun' | 'secondary_noun'
+export const testRandomTitleParts: Record<TitlePart, WeightedItem<string>[]> = {
+  adverb: [
+    { value: 'Completely' },
+    { value: 'Mysteriously' },
+    { value: 'Slightly' },
+    { value: 'Sexually' },
+    { value: 'Pretty' },
+    { value: "The Queen's" },
+    { value: "Grandma's" },
+    { value: 'Your' },
+    { value: 'My' },
+    { value: 'The' },
+  ],
+  adjective: [
+    { value: 'Louisiana' },
+    { value: 'Tropical' },
+    { value: 'Hot' },
+    { value: 'Wet' },
+    { value: 'Moist' },
+    { value: 'American' },
+    { value: 'Brazilian' },
+    { value: 'English' },
+    { value: 'Funky' },
+    { value: 'Kinky' },
+  ],
+  noun: [
+    { value: 'Explosion' },
+    { value: 'Gutpunch' },
+    { value: 'Hole' },
+    { value: 'Fart' },
+    { value: 'Promise' },
+    { value: 'Secret' },
+    { value: 'Bro' },
+    { value: 'Breeze' },
+    { value: 'Cowboy' },
+    { value: 'Haircut' },
+    { value: 'Man' },
+    { value: 'God' },
+    { value: 'Bomb' },
+    { value: 'Tea' },
+    { value: 'Underwear' },
+  ],
+  secondary_noun: [
+    { value: 'Party' },
+    { value: 'Killer' },
+    { value: 'Seducer' },
+    { value: 'Salesman' },
+    { value: 'on the Beach' },
+    { value: 'of Pain' },
+    { value: 'Fetish' },
+    { value: 'in a Cup' },
+    { value: 'of All Time' },
+    { value: 'Impersonator' },
+    { value: 'Kisser' },
+    { value: 'Destroyer' },
+  ],
+}
+
 export const randomTitleParts: Record<TitlePart, WeightedItem<string>[]> = {
   adverb: [
     { value: 'Extremely' },

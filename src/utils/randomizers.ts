@@ -5,7 +5,13 @@ import {
 } from '../types/drink'
 import { WeightedList } from '../types/WeightedList'
 import {
+  type Combo,
+  type CompatibilityMatrix,
+  weightedSelect,
+} from './compatibilityMatrix'
+import {
   type CombinePart,
+  type TitlePart,
   randomAmountParts,
   randomIngredientParts,
   randomInstructionParts,
@@ -136,42 +142,38 @@ const generateRandomInstructions = (): string[] => {
   return instructions
 }
 
-const generateRandomTitle = (): string => {
-  let title = ''
-  let adverbPresent = false
-  let adjectivePresent = false
-
-  if (Math.random() < 0.2) {
-    title = title.concat(
-      `${new WeightedList(randomTitleParts.adverb).randomlySelectItem()} `,
-    )
-    adverbPresent = true
-  }
-
-  if (Math.random() < 0.7 || title.length > 0) {
-    title = title.concat(
-      `${new WeightedList(randomTitleParts.adjective).randomlySelectItem()} `,
-    )
-    adjectivePresent = true
-  }
-
-  title = title.concat(
-    new WeightedList(randomTitleParts.noun).randomlySelectItem(),
-  )
-
+const generateRandomTitle = (
+  matrix?: CompatibilityMatrix,
+): { title: string; combo: Combo<string> } => {
+  const adverbPresent = Math.random() < 0.2
+  const adjectivePresent = adverbPresent || Math.random() < 0.7
   let secondaryNounThreshold = 0.9
-  if (adverbPresent) {
-    secondaryNounThreshold = 0.1
-  } else if (adjectivePresent) {
-    secondaryNounThreshold = 0.25
-  }
-  if (Math.random() < secondaryNounThreshold) {
-    title = title.concat(
-      ` ${new WeightedList(randomTitleParts.secondary_noun).randomlySelectItem()}`,
-    )
+  if (adverbPresent) secondaryNounThreshold = 0.1
+  else if (adjectivePresent) secondaryNounThreshold = 0.25
+  const secondaryNounPresent = Math.random() < secondaryNounThreshold
+
+  const activeRoles: TitlePart[] = [
+    ...(adverbPresent ? (['adverb'] as const) : []),
+    ...(adjectivePresent ? (['adjective'] as const) : []),
+    'noun',
+    ...(secondaryNounPresent ? (['secondary_noun'] as const) : []),
+  ]
+
+  const combo: Combo<string> = {}
+
+  for (const role of activeRoles) {
+    const candidates = randomTitleParts[role]
+    combo[role] = [
+      matrix
+        ? weightedSelect(matrix, combo, role, candidates, (item) => item)
+        : new WeightedList(candidates).randomlySelectItem(),
+    ]
   }
 
-  return title
+  return {
+    title: activeRoles.map((r) => combo[r][0]).join(' '),
+    combo,
+  }
 }
 
 // Helper function for generateAbbreviation
@@ -198,13 +200,16 @@ function generateRandomIcon(): GlassIconName {
   return WeightedList.from(GLASS_TYPES).randomlySelectItem()
 }
 
-export function generateRandomDrink(): DrinkProps {
-  const title = generateRandomTitle()
+export function generateRandomDrink(
+  matrix?: CompatibilityMatrix,
+): DrinkProps & { titleCombo: Combo<string> } {
+  const { title, combo } = generateRandomTitle(matrix)
   return {
-    title: title,
+    title,
     abbreviation: generateAbbreviation(title),
     icon: generateRandomIcon(),
     ingredients: generateRandomIngredients(),
     instructions: generateRandomInstructions(),
+    titleCombo: combo,
   }
 }
