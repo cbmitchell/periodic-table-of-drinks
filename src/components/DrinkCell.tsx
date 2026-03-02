@@ -132,7 +132,7 @@ export const DrinkCell = memo(function DrinkCell({
                 src={`glass-icons/${iconColor}/${icon}.png`}
                 alt={`${icon} glass`}
                 onError={hideOnError}
-                sx={{ width: '100%', position: 'absolute', bottom: 0 }}
+                sx={{ width: '100%', position: 'absolute', bottom: 0, left: 6 }}
               />
             </Grid>
           </Grid>
