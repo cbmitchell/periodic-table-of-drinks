@@ -75,6 +75,7 @@ export default function App() {
 					drinks={filledDrinkData}
 					viewMode={viewMode}
 					onDrinkClick={setSelectedDrink}
+					groupLabels={drinkLists[listSelection].groupLabels}
 				/>
 			</ErrorBoundary>
 			<DrinkDetailModal

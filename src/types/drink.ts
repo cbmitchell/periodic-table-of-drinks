@@ -36,4 +36,5 @@ export interface DrinkList {
   drinks: DrinkProps[]
   isRandom?: boolean
   path?: string
+  groupLabels?: Partial<Record<ElementGroup, string>>
 }

@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { memo, useEffect, useMemo, useState } from 'react'
+import type { ElementGroup } from '../types/ElementGroup'
 import {
   CELL_HEIGHT,
   CELL_WIDTH,
@@ -8,6 +9,7 @@ import {
   DrinkCell,
   type DrinkCellProps,
 } from './DrinkCell'
+import { GroupKeyLegend } from './GroupKeyLegend'
 
 const GAP_PX = 4 // MUI gap: 0.5 = 4px
 const COMPACT_LABEL_COL_W = 20 // width of row-number column in compact mode
@@ -32,12 +34,14 @@ interface PeriodicTableProps {
   drinks: DrinkCellProps[]
   viewMode: 'full' | 'compact'
   onDrinkClick?: (drink: DrinkCellProps) => void
+  groupLabels?: Partial<Record<ElementGroup, string>>
 }
 
 export const PeriodicTable = memo(function PeriodicTable({
   drinks,
   viewMode,
   onDrinkClick,
+  groupLabels,
 }: PeriodicTableProps) {
   const [scale, setScale] = useState(calculateScale)
 
@@ -167,6 +171,23 @@ export const PeriodicTable = memo(function PeriodicTable({
           </Box>
         )
       })}
+
+      {/* Group key legend — sits in the empty space above the d-block columns (labeled 3–12) */}
+      {groupLabels && (
+        <Box
+          sx={{
+            gridRow: 3,
+            gridColumn: '5 / 14',
+            alignSelf: 'start',
+            height: 0,
+            overflow: 'visible',
+          }}
+        >
+          <Box sx={{ pt: 0, pl: 1 }}>
+            <GroupKeyLegend groupLabels={groupLabels} compact={isCompact} />
+          </Box>
+        </Box>
+      )}
 
       {/* Drink cells — shifted +1 on both axes for the label row/column */}
       {drinks.map((drink) => (

@@ -13,7 +13,7 @@ import { memo } from 'react'
 import type { ElementGroup } from '../types/ElementGroup'
 import type { DrinkProps } from '../types/drink'
 
-const elementGroupColors: Record<ElementGroup, string> = {
+export const elementGroupColors: Record<ElementGroup, string> = {
   alkali_metals: '#f2b3d3',
   alkaline_earth_metals: '#f2e2b3',
   transition_metals: '#f1f2b3',
