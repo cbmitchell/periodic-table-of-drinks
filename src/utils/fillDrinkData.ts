@@ -23,5 +23,5 @@ export function fillDrinkData(drinks: DrinkProps[], randomFill: boolean): DrinkC
       if (randomFill) return { ...generateRandomDrink(), ...defaultCell }
       return null
     })
-    .filter((d): d is DrinkCellProps => d !== null)
+    .filter((d) => d !== null) as DrinkCellProps[]
 }
