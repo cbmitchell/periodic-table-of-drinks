@@ -1593,9 +1593,9 @@ export const drinkData: DrinkProps[] = [
 
 export const drinkLists: DrinkList[] = [
   {
-    title: 'The Dr. Mitchell Special',
+    title: 'The Andrew Mitchell Special',
     description: `A whole table of drinks carefully compiled and assembled by 
-    Andrew Mitchell, radiochemist & mixologist extraordinaire.`,
+    Andrew Mitchell, radiochemist & mixologist.`,
     drinks: drinkData,
     path: 'mitchell',
     groupLabels: {
