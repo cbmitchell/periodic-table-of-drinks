@@ -129,7 +129,7 @@ export const DrinkCell = memo(function DrinkCell({
             <Grid size={4} sx={{ position: 'relative' }}>
               <Box
                 component="img"
-                src={`glass-icons/${iconColor}/${icon}.png`}
+                src={`${import.meta.env.BASE_URL}glass-icons/${iconColor}/${icon}.png`}
                 alt={`${icon} glass`}
                 onError={hideOnError}
                 sx={{ width: '100%', position: 'absolute', bottom: 0, left: 6 }}
@@ -165,7 +165,7 @@ export const DrinkCell = memo(function DrinkCell({
             <Grid size={4} sx={{ position: 'relative' }}>
               <Box
                 component="img"
-                src={`glass-icons/${iconColor}/${icon}.png`}
+                src={`${import.meta.env.BASE_URL}glass-icons/${iconColor}/${icon}.png`}
                 alt={`${icon} glass`}
                 onError={hideOnError}
                 sx={{

@@ -15,7 +15,7 @@ export function DrinkDetailModal({ drink, onClose }: DrinkDetailModalProps) {
   const cellRef = useRef<HTMLDivElement>(null)
   const theme = useTheme()
   const logoColor = theme.palette.mode === 'dark' ? 'white' : 'black'
-  const logoSrc = `logos/${logoColor}/PToD.png`
+  const logoSrc = `${import.meta.env.BASE_URL}logos/${logoColor}/PToD.png`
 
   const handleSave = async () => {
     if (!cellRef.current) return
