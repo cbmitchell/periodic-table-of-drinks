@@ -9,6 +9,7 @@ import {
   DrinkCell,
   type DrinkCellProps,
 } from './DrinkCell'
+import { CellLegend } from './CellLegend'
 import { GroupKeyLegend } from './GroupKeyLegend'
 
 const GAP_PX = 4 // MUI gap: 0.5 = 4px
@@ -59,6 +60,11 @@ export const PeriodicTable = memo(function PeriodicTable({
 
   // Compute the first (minimum) row occupied in each column, so each column
   // number can be placed just above that cell rather than at a uniform top.
+  const firstDrink = useMemo(
+    () => drinks.find((d) => d.atomic_number === 1),
+    [drinks],
+  )
+
   const minRowByCol = useMemo(
     () =>
       drinks.reduce<Record<number, number>>((acc, drink) => {
@@ -186,6 +192,26 @@ export const PeriodicTable = memo(function PeriodicTable({
           <Box sx={{ pt: 0, pl: 1 }}>
             <GroupKeyLegend groupLabels={groupLabels} compact={isCompact} />
           </Box>
+        </Box>
+      )}
+
+      {/* Cell legend — floats above the table starting at column 7 */}
+      {firstDrink && (
+        <Box
+          sx={{
+            gridRow: 3,
+            gridColumn: '8 / -1',
+            alignSelf: 'start',
+            height: 0,
+            overflow: 'visible',
+          }}
+        >
+          <CellLegend
+            drink={firstDrink}
+            compact={isCompact}
+            cellWidth={cellWidth}
+            cellHeight={cellHeight}
+          />
         </Box>
       )}
 
