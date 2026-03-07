@@ -129,6 +129,7 @@ export const PeriodicTable = memo(function PeriodicTable({
           textAlign: 'center',
           fontWeight: 'bold',
           py: 1,
+          fontSize: isCompact ? '48pt' : '98pt'
         }}
       >
         Periodic Table of Drinks
@@ -206,12 +207,14 @@ export const PeriodicTable = memo(function PeriodicTable({
             overflow: 'visible',
           }}
         >
-          <CellLegend
-            drink={firstDrink}
-            compact={isCompact}
-            cellWidth={cellWidth}
-            cellHeight={cellHeight}
-          />
+          <Box sx={{ marginTop: `${0.5 * cellHeight + GAP_PX}px` }}>
+            <CellLegend
+              drink={firstDrink}
+              compact={isCompact}
+              cellWidth={cellWidth}
+              cellHeight={cellHeight}
+            />
+          </Box>
         </Box>
       )}
 

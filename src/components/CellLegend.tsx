@@ -15,8 +15,9 @@ interface CellLegendProps {
 }
 
 export function CellLegend({ drink, compact, cellWidth, cellHeight }: CellLegendProps) {
-  const scaledWidth = cellWidth * 2
-  const scaledHeight = cellHeight * 2
+  const SCALE_FACTOR = 1.5
+  const scaledWidth = cellWidth * SCALE_FACTOR
+  const scaledHeight = cellHeight * SCALE_FACTOR
 
   const labelFontSize = compact ? '10pt' : '14pt'
   const lineWidth = compact ? 16 : 24
@@ -46,9 +47,18 @@ export function CellLegend({ drink, compact, cellWidth, cellHeight }: CellLegend
       ]
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+    <Box
+      sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}
+    >
       {/* Left labels */}
-      <Box sx={{ position: 'relative', width: leftColWidth, height: scaledHeight, flexShrink: 0 }}>
+      <Box
+        sx={{
+          position: 'relative',
+          width: leftColWidth,
+          height: scaledHeight,
+          flexShrink: 0,
+        }}
+      >
         {leftLabels.map(({ text, topFraction }) => (
           <Box
             key={text}
@@ -62,22 +72,42 @@ export function CellLegend({ drink, compact, cellWidth, cellHeight }: CellLegend
               transform: 'translateY(-50%)',
             }}
           >
-            <Typography sx={{ fontSize: labelFontSize, whiteSpace: 'nowrap', color: 'text.secondary' }}>
+            <Typography
+              sx={{
+                fontSize: labelFontSize,
+                whiteSpace: 'nowrap',
+                color: 'text.secondary',
+              }}
+            >
               {text}
             </Typography>
-            <Box sx={{ width: lineWidth, height: '1px', bgcolor: 'text.secondary', flexShrink: 0 }} />
+            <Box
+              sx={{
+                width: lineWidth,
+                height: '1px',
+                bgcolor: 'text.secondary',
+                flexShrink: 0,
+              }}
+            />
           </Box>
         ))}
       </Box>
 
       {/* Scaled cell */}
-      <Box sx={{ width: scaledWidth, height: scaledHeight, position: 'relative', flexShrink: 0 }}>
+      <Box
+        sx={{
+          width: scaledWidth,
+          height: scaledHeight,
+          position: 'relative',
+          flexShrink: 0,
+        }}
+      >
         <Box
           sx={{
             position: 'absolute',
             top: 0,
             left: 0,
-            transform: 'scale(2)',
+            transform: `scale(${SCALE_FACTOR})`,
             transformOrigin: 'top left',
           }}
         >
@@ -86,7 +116,14 @@ export function CellLegend({ drink, compact, cellWidth, cellHeight }: CellLegend
       </Box>
 
       {/* Right labels */}
-      <Box sx={{ position: 'relative', width: rightColWidth, height: scaledHeight, flexShrink: 0 }}>
+      <Box
+        sx={{
+          position: 'relative',
+          width: rightColWidth,
+          height: scaledHeight,
+          flexShrink: 0,
+        }}
+      >
         {rightLabels.map(({ text, topFraction }) => (
           <Box
             key={text}
@@ -100,8 +137,21 @@ export function CellLegend({ drink, compact, cellWidth, cellHeight }: CellLegend
               transform: 'translateY(-50%)',
             }}
           >
-            <Box sx={{ width: lineWidth, height: '1px', bgcolor: 'text.secondary', flexShrink: 0 }} />
-            <Typography sx={{ fontSize: labelFontSize, whiteSpace: 'nowrap', color: 'text.secondary' }}>
+            <Box
+              sx={{
+                width: lineWidth,
+                height: '1px',
+                bgcolor: 'text.secondary',
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                fontSize: labelFontSize,
+                whiteSpace: 'nowrap',
+                color: 'text.secondary',
+              }}
+            >
               {text}
             </Typography>
           </Box>
