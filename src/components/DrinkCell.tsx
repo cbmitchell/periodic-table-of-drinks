@@ -65,6 +65,7 @@ export const DrinkCell = memo(function DrinkCell({
   row,
   col,
   group,
+  atomic_number,
   compact = false,
   onClick,
 }: DrinkCellProps) {
@@ -90,10 +91,25 @@ export const DrinkCell = memo(function DrinkCell({
         gridRow: row,
         gridColumn: col,
         overflow: 'hidden',
+        position: 'relative',
         cursor: compact ? 'pointer' : 'default',
         '&:hover': compact ? { boxShadow: 6 } : undefined,
       }}
     >
+      {atomic_number != null && (
+        <Typography
+          sx={{
+            position: 'absolute',
+            top: compact ? 4 : 8,
+            right: compact ? 4 : 8,
+            fontSize: compact ? '6pt' : '8pt',
+            lineHeight: 1,
+            zIndex: 1,
+          }}
+        >
+          {atomic_number}
+        </Typography>
+      )}
       <CardContent
         sx={{ p: compact ? 1 : 2, '&:last-child': { pb: compact ? 1 : 2 } }}
       >

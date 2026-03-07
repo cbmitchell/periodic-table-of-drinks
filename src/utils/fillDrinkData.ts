@@ -20,7 +20,7 @@ export function fillDrinkData(drinks: DrinkProps[], randomFill: boolean): DrinkC
     .map((defaultCell, index) => {
       const drinkItem = drinkByAtomicNumber.get(index + 1)
       if (drinkItem) return { ...defaultCell, ...drinkItem }
-      if (randomFill) return { ...generateRandomDrink(), ...defaultCell }
+      if (randomFill) return { ...generateRandomDrink(), ...defaultCell, atomic_number: index + 1 }
       return null
     })
     .filter((d) => d !== null) as DrinkCellProps[]
