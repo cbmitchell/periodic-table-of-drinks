@@ -20,6 +20,8 @@ export function DrinkDetailModal({ drink, onClose }: DrinkDetailModalProps) {
   const handleSave = async () => {
     if (!cellRef.current) return
     try {
+      // First call loads external resources (images, fonts); second call captures correctly
+      await toPng(cellRef.current, { pixelRatio: 2 })
       const dataUrl = await toPng(cellRef.current, { pixelRatio: 2 })
       const link = document.createElement('a')
       link.href = dataUrl
@@ -33,11 +35,19 @@ export function DrinkDetailModal({ drink, onClose }: DrinkDetailModalProps) {
   const handleCopy = async () => {
     if (!cellRef.current) return
     try {
+      const el = cellRef.current
+      // clipboard.write must be called within the user gesture activation window,
+      // so call it immediately with a Promise — Chrome keeps the permission alive
+      // while the Promise resolves, allowing the warmup + capture to happen inside.
       await navigator.clipboard.write([
         new ClipboardItem({
-          'image/png': toBlob(cellRef.current, {
-            pixelRatio: 2,
-          }) as Promise<Blob>,
+          'image/png': (async () => {
+            // First call loads external resources (images, fonts); second call captures correctly
+            await toPng(el, { pixelRatio: 2 })
+            const blob = await toBlob(el, { pixelRatio: 2 })
+            if (!blob) throw new Error('Failed to generate image blob')
+            return blob
+          })(),
         }),
       ])
     } catch (err) {
