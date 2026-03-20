@@ -1,6 +1,10 @@
 import CloseIcon from '@mui/icons-material/Close'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import TuneIcon from '@mui/icons-material/Tune'
+import ZoomInIcon from '@mui/icons-material/ZoomIn'
+import ZoomOutIcon from '@mui/icons-material/ZoomOut'
 import {
+  Box,
   Button,
   FormControl,
   FormControlLabel,
@@ -12,7 +16,9 @@ import {
   Paper,
   Select,
   Switch,
+  Typography,
 } from '@mui/material'
+import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import { drinkLists } from '../assets/drinkData'
 import type { ListSelection } from '../types/ListSelection'
 
@@ -25,6 +31,8 @@ interface ControlPanelProps {
   onListChange: (selection: ListSelection) => void
   darkMode: boolean
   onDarkModeToggle: () => void
+  zoomRef?: React.RefObject<ReactZoomPanPinchRef | null>
+  zoomScale?: number | null
 }
 
 export function ControlPanel({
@@ -36,6 +44,8 @@ export function ControlPanel({
   onListChange,
   darkMode,
   onDarkModeToggle,
+  zoomRef,
+  zoomScale,
 }: ControlPanelProps) {
   const zIndex = (theme: { zIndex: { modal: number } }) => theme.zIndex.modal + 1
 
@@ -44,10 +54,11 @@ export function ControlPanel({
       <IconButton
         onClick={onCollapseToggle}
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           top: 16,
           right: 16,
           zIndex,
+          pointerEvents: 'auto',
           bgcolor: 'background.paper',
           boxShadow: 3,
           borderRadius: 1,
@@ -61,10 +72,11 @@ export function ControlPanel({
         <Paper
           elevation={3}
           sx={{
-            position: 'fixed',
+            position: 'absolute',
             top: 56,
             right: 16,
             zIndex,
+            pointerEvents: 'auto',
             width: 220,
             p: 2,
             display: 'flex',
@@ -99,6 +111,36 @@ export function ControlPanel({
           >
             {viewMode === 'compact' ? 'Full View' : 'Compact View'}
           </Button>
+          {viewMode === 'compact' && (
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Zoom {zoomScale != null ? `${Math.round(zoomScale * 100)}%` : ''}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                <IconButton
+                  size="small"
+                  onClick={() => zoomRef?.current?.zoomOut()}
+                  sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+                >
+                  <ZoomOutIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => zoomRef?.current?.zoomIn()}
+                  sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+                >
+                  <ZoomInIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => zoomRef?.current?.resetTransform()}
+                  sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+                >
+                  <RestartAltIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Box>
+          )}
           <FormControlLabel
             control={
               <Switch

@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo } from 'react'
+import { TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import type { ElementGroup } from '../types/ElementGroup'
 import {
   CELL_HEIGHT,
@@ -36,6 +37,8 @@ interface PeriodicTableProps {
   viewMode: 'full' | 'compact'
   onDrinkClick?: (drink: DrinkCellProps) => void
   groupLabels?: Partial<Record<ElementGroup, string>>
+  transformRef?: React.RefObject<ReactZoomPanPinchRef | null>
+  onZoomChange?: (scale: number) => void
 }
 
 export const PeriodicTable = memo(function PeriodicTable({
@@ -43,15 +46,15 @@ export const PeriodicTable = memo(function PeriodicTable({
   viewMode,
   onDrinkClick,
   groupLabels,
+  transformRef,
+  onZoomChange,
 }: PeriodicTableProps) {
-  const [scale, setScale] = useState(calculateScale)
-
   useEffect(() => {
     if (viewMode !== 'compact') return
-    const handleResize = () => setScale(calculateScale())
+    const handleResize = () => transformRef?.current?.centerView(calculateScale())
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [viewMode])
+  }, [viewMode, transformRef])
 
   const isCompact = viewMode === 'compact'
   const cellWidth = isCompact ? COMPACT_CELL_WIDTH : CELL_WIDTH
@@ -236,24 +239,19 @@ export const PeriodicTable = memo(function PeriodicTable({
 
   if (isCompact) {
     return (
-      <Box
-        sx={{
-          position: 'fixed',
-          inset: 0,
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Box
-          sx={{
-            transform: `scale(${scale})`,
-            transformOrigin: 'center',
-          }}
+      <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
+        <TransformWrapper
+          ref={transformRef}
+          initialScale={calculateScale()}
+          minScale={0.1}
+          maxScale={4}
+          centerOnInit
+          onTransformed={(_, state) => onZoomChange?.(state.scale)}
         >
-          {grid}
-        </Box>
+          <TransformComponent wrapperStyle={{ width: '100vw', height: '100vh' }}>
+            {grid}
+          </TransformComponent>
+        </TransformWrapper>
       </Box>
     )
   }

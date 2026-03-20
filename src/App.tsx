@@ -1,8 +1,10 @@
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { drinkLists } from "./assets/drinkData";
 import { ControlPanel } from "./components/ControlPanel";
+import { ViewportOverlay } from "./components/ViewportOverlay";
 import type { DrinkCellProps } from "./components/DrinkCell";
 import { DrinkDetailModal } from "./components/DrinkDetailModal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -37,6 +39,8 @@ export default function App() {
 		return 0;
 	});
 	const [darkMode, setDarkMode] = useSessionStorage("ptod_dark_mode", false);
+	const zoomRef = useRef<ReactZoomPanPinchRef>(null);
+	const [zoomScale, setZoomScale] = useState<number | null>(null);
 
 	const filledDrinkData = useMemo(() => {
 		const list = drinkLists[listSelection];
@@ -76,6 +80,8 @@ export default function App() {
 					viewMode={viewMode}
 					onDrinkClick={setSelectedDrink}
 					groupLabels={drinkLists[listSelection].groupLabels}
+					transformRef={zoomRef}
+					onZoomChange={setZoomScale}
 				/>
 			</ErrorBoundary>
 			<DrinkDetailModal
@@ -83,16 +89,20 @@ export default function App() {
 				onClose={() => setSelectedDrink(null)}
 			/>
 			{panelVisible && (
-				<ControlPanel
-					viewMode={viewMode}
-					onViewModeChange={setViewMode}
-					collapsed={panelCollapsed}
-					onCollapseToggle={() => setPanelCollapsed(!panelCollapsed)}
-					listSelection={listSelection}
-					onListChange={setListSelection}
-					darkMode={darkMode}
-					onDarkModeToggle={() => setDarkMode(!darkMode)}
-				/>
+				<ViewportOverlay>
+					<ControlPanel
+						viewMode={viewMode}
+						onViewModeChange={setViewMode}
+						collapsed={panelCollapsed}
+						onCollapseToggle={() => setPanelCollapsed(!panelCollapsed)}
+						listSelection={listSelection}
+						onListChange={setListSelection}
+						darkMode={darkMode}
+						onDarkModeToggle={() => setDarkMode(!darkMode)}
+						zoomRef={zoomRef}
+						zoomScale={zoomScale}
+					/>
+				</ViewportOverlay>
 			)}
 		</ThemeProvider>
 	);

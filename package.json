@@ -16,7 +16,8 @@
     "@mui/material": "^7.3.8",
     "html-to-image": "^1.11.13",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-zoom-pan-pinch": "^3.7.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
