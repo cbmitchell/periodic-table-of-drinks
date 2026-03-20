@@ -17,18 +17,18 @@ const GAP_PX = 4 // MUI gap: 0.5 = 4px
 const COMPACT_LABEL_COL_W = 20 // width of row-number column in compact mode
 const COMPACT_LABEL_ROW_H = 16 // height of column-number row in compact mode
 const COMPACT_TITLE_ROW_H = 64 // estimated height of the title row
-const COMPACT_TABLE_WIDTH =
-  18 * COMPACT_CELL_WIDTH + 17 * GAP_PX + GAP_PX + COMPACT_LABEL_COL_W
-export const FULL_TABLE_WIDTH = 18 * CELL_WIDTH + 17 * GAP_PX
-const COMPACT_TABLE_HEIGHT =
-  10 * COMPACT_CELL_HEIGHT + 9 * GAP_PX + GAP_PX + COMPACT_LABEL_ROW_H + GAP_PX + COMPACT_TITLE_ROW_H
 const SCALE_PADDING = 32
 
-function calculateScale(): number {
+function calculateScale(cellWidth: number, cellHeight: number): number {
+  const scaleFactor = cellWidth / COMPACT_CELL_WIDTH
+  const labelColW = COMPACT_LABEL_COL_W * scaleFactor
+  const labelRowH = COMPACT_LABEL_ROW_H * scaleFactor
+  const titleRowH = COMPACT_TITLE_ROW_H * scaleFactor
+  const tableWidth = 18 * cellWidth + 17 * GAP_PX + GAP_PX + labelColW
+  const tableHeight = 10 * cellHeight + 9 * GAP_PX + GAP_PX + labelRowH + GAP_PX + titleRowH
   return Math.min(
-    (window.innerWidth - SCALE_PADDING) / COMPACT_TABLE_WIDTH,
-    (window.innerHeight - SCALE_PADDING) / COMPACT_TABLE_HEIGHT,
-    1,
+    (window.innerWidth - SCALE_PADDING) / tableWidth,
+    (window.innerHeight - SCALE_PADDING) / tableHeight,
   )
 }
 
@@ -49,17 +49,20 @@ export const PeriodicTable = memo(function PeriodicTable({
   transformRef,
   onZoomChange,
 }: PeriodicTableProps) {
-  useEffect(() => {
-    if (viewMode !== 'compact') return
-    const handleResize = () => transformRef?.current?.centerView(calculateScale())
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [viewMode, transformRef])
-
   const isCompact = viewMode === 'compact'
   const cellWidth = isCompact ? COMPACT_CELL_WIDTH : CELL_WIDTH
   const cellHeight = isCompact ? COMPACT_CELL_HEIGHT : CELL_HEIGHT
   const labelFontSize = isCompact ? '16pt' : '28pt'
+
+  useEffect(() => {
+    const handleResize = () => transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [transformRef, cellWidth, cellHeight])
+
+  useEffect(() => {
+    transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
+  }, [transformRef, cellWidth, cellHeight])
 
   // Compute the first (minimum) row occupied in each column, so each column
   // number can be placed just above that cell rather than at a uniform top.
@@ -237,24 +240,20 @@ export const PeriodicTable = memo(function PeriodicTable({
     </Box>
   )
 
-  if (isCompact) {
-    return (
-      <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
-        <TransformWrapper
-          ref={transformRef}
-          initialScale={calculateScale()}
-          minScale={0.1}
-          maxScale={4}
-          centerOnInit
-          onTransformed={(_, state) => onZoomChange?.(state.scale)}
-        >
-          <TransformComponent wrapperStyle={{ width: '100vw', height: '100vh' }}>
-            {grid}
-          </TransformComponent>
-        </TransformWrapper>
-      </Box>
-    )
-  }
-
-  return <Box sx={{ width: '100%', height: '100vh' }}>{grid}</Box>
+  return (
+    <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
+      <TransformWrapper
+        ref={transformRef}
+        initialScale={calculateScale(cellWidth, cellHeight)}
+        minScale={0.1}
+        maxScale={4}
+        centerOnInit
+        onTransformed={(_, state) => onZoomChange?.(state.scale)}
+      >
+        <TransformComponent wrapperStyle={{ width: '100vw', height: '100vh' }}>
+          {grid}
+        </TransformComponent>
+      </TransformWrapper>
+    </Box>
+  )
 })

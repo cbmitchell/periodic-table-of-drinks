@@ -111,36 +111,34 @@ export function ControlPanel({
           >
             {viewMode === 'compact' ? 'Full View' : 'Compact View'}
           </Button>
-          {viewMode === 'compact' && (
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Zoom {zoomScale != null ? `${Math.round(zoomScale * 100)}%` : ''}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() => zoomRef?.current?.zoomOut()}
-                  sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
-                >
-                  <ZoomOutIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => zoomRef?.current?.zoomIn()}
-                  sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
-                >
-                  <ZoomInIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => zoomRef?.current?.resetTransform()}
-                  sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
-                >
-                  <RestartAltIcon fontSize="small" />
-                </IconButton>
-              </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              Zoom {zoomScale != null ? `${Math.round(zoomScale * 100)}%` : ''}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+              <IconButton
+                size="small"
+                onClick={() => zoomRef?.current?.zoomOut()}
+                sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+              >
+                <ZoomOutIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => zoomRef?.current?.zoomIn()}
+                sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+              >
+                <ZoomInIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => zoomRef?.current?.resetTransform()}
+                sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
+              >
+                <RestartAltIcon fontSize="small" />
+              </IconButton>
             </Box>
-          )}
+          </Box>
           <FormControlLabel
             control={
               <Switch
