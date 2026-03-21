@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import { elementGroupColors } from '../constants/elementGroupColors'
 import type { ElementGroup } from '../types/ElementGroup'
-import { elementGroupColors } from './DrinkCell'
 
 const GROUP_ORDER: ElementGroup[] = [
   'alkali_metals',
