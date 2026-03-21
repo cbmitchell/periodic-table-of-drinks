@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { memo, useEffect, useMemo } from 'react'
+import { memo, useEffect, useMemo, useRef } from 'react'
 import { TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import type { ElementGroup } from '../types/ElementGroup'
 import {
@@ -54,11 +54,49 @@ export const PeriodicTable = memo(function PeriodicTable({
   const cellHeight = isCompact ? COMPACT_CELL_HEIGHT : CELL_HEIGHT
   const labelFontSize = isCompact ? '16pt' : '28pt'
 
+  const containerRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     const handleResize = () => transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [transformRef, cellWidth, cellHeight])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      const state = transformRef?.current?.instance.transformState
+      if (!state) return
+      if (e.ctrlKey) {
+        // Trackpad pinch: zoom toward cursor position
+        const scaleFactor = Math.exp(-e.deltaY * 0.003)
+        const newScale = Math.min(Math.max(state.scale * scaleFactor, 0.1), 4)
+        const rect = container.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
+        const contentX = (mouseX - state.positionX) / state.scale
+        const contentY = (mouseY - state.positionY) / state.scale
+        transformRef?.current?.setTransform(
+          mouseX - contentX * newScale,
+          mouseY - contentY * newScale,
+          newScale,
+          0,
+        )
+        return
+      }
+      // Regular scroll: pan
+      transformRef?.current?.setTransform(
+        state.positionX - e.deltaX,
+        state.positionY - e.deltaY,
+        state.scale,
+        0,
+      )
+    }
+    container.addEventListener('wheel', handleWheel, { passive: false })
+    return () => container.removeEventListener('wheel', handleWheel)
+  }, [transformRef])
 
   useEffect(() => {
     transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
@@ -241,13 +279,14 @@ export const PeriodicTable = memo(function PeriodicTable({
   )
 
   return (
-    <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
+    <Box ref={containerRef} sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
       <TransformWrapper
         ref={transformRef}
         initialScale={calculateScale(cellWidth, cellHeight)}
         minScale={0.1}
         maxScale={4}
         centerOnInit
+        wheel={{ disabled: true }}
         onTransformed={(_, state) => onZoomChange?.(state.scale)}
       >
         <TransformComponent wrapperStyle={{ width: '100vw', height: '100vh' }}>
