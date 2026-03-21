@@ -1,6 +1,10 @@
 import { Box, Typography } from '@mui/material'
 import { memo, useEffect, useMemo, useRef } from 'react'
-import { TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
+import {
+  TransformComponent,
+  TransformWrapper,
+  type ReactZoomPanPinchRef,
+} from 'react-zoom-pan-pinch'
 import type { ElementGroup } from '../types/ElementGroup'
 import {
   CELL_HEIGHT,
@@ -25,7 +29,8 @@ function calculateScale(cellWidth: number, cellHeight: number): number {
   const labelRowH = COMPACT_LABEL_ROW_H * scaleFactor
   const titleRowH = COMPACT_TITLE_ROW_H * scaleFactor
   const tableWidth = 18 * cellWidth + 17 * GAP_PX + GAP_PX + labelColW
-  const tableHeight = 10 * cellHeight + 9 * GAP_PX + GAP_PX + labelRowH + GAP_PX + titleRowH
+  const tableHeight =
+    10 * cellHeight + 9 * GAP_PX + GAP_PX + labelRowH + GAP_PX + titleRowH
   return Math.min(
     (window.innerWidth - SCALE_PADDING) / tableWidth,
     (window.innerHeight - SCALE_PADDING) / tableHeight,
@@ -55,12 +60,35 @@ export const PeriodicTable = memo(function PeriodicTable({
   const labelFontSize = isCompact ? '16pt' : '28pt'
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleResize = () => transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
+    const handleResize = () =>
+      transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [transformRef, cellWidth, cellHeight])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    let startX = 0,
+      startY = 0
+    const onPointerDown = (e: PointerEvent) => {
+      startX = e.clientX
+      startY = e.clientY
+    }
+    const onClickCapture = (e: MouseEvent) => {
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) > 5)
+        e.stopPropagation()
+    }
+    container.addEventListener('pointerdown', onPointerDown)
+    container.addEventListener('click', onClickCapture, { capture: true })
+    return () => {
+      container.removeEventListener('pointerdown', onPointerDown)
+      container.removeEventListener('click', onClickCapture, { capture: true })
+    }
+  }, [])
 
   useEffect(() => {
     const container = containerRef.current
@@ -86,16 +114,51 @@ export const PeriodicTable = memo(function PeriodicTable({
         )
         return
       }
-      // Regular scroll: pan
-      transformRef?.current?.setTransform(
-        state.positionX - e.deltaX,
-        state.positionY - e.deltaY,
-        state.scale,
-        0,
-      )
+      // Regular scroll: pan with same bounds as drag
+      let newX = state.positionX - e.deltaX
+      let newY = state.positionY - e.deltaY
+      const grid = gridRef.current
+      if (grid) {
+        const gridW = grid.offsetWidth * state.scale
+        const gridH = grid.offsetHeight * state.scale
+        const wrapperW = window.innerWidth
+        const wrapperH = window.innerHeight
+        newX = Math.min(
+          Math.max(newX, Math.min(0, wrapperW - gridW)),
+          Math.max(0, wrapperW - gridW),
+        )
+        newY = Math.min(
+          Math.max(newY, Math.min(0, wrapperH - gridH)),
+          Math.max(0, wrapperH - gridH),
+        )
+      }
+      transformRef?.current?.setTransform(newX, newY, state.scale, 0)
+
+      // After scroll ends, center any axis where the content fits in the viewport
+      clearTimeout(scrollEndTimer)
+      scrollEndTimer = setTimeout(() => {
+        const s = transformRef?.current?.instance.transformState
+        const g = gridRef.current
+        if (!s || !g) return
+        const gridW = g.offsetWidth * s.scale
+        const gridH = g.offsetHeight * s.scale
+        const fitsX = gridW <= window.innerWidth
+        const fitsY = gridH <= window.innerHeight
+        if (!fitsX && !fitsY) return
+        transformRef?.current?.setTransform(
+          fitsX ? (window.innerWidth - gridW) / 2 : s.positionX,
+          fitsY ? (window.innerHeight - gridH) / 2 : s.positionY,
+          s.scale,
+          200,
+        )
+      }, 75)
     }
+    let scrollEndTimer: ReturnType<typeof setTimeout>
     container.addEventListener('wheel', handleWheel, { passive: false })
-    return () => container.removeEventListener('wheel', handleWheel)
+    return () => {
+      container.removeEventListener('wheel', handleWheel)
+      clearTimeout(scrollEndTimer)
+    }
   }, [transformRef])
 
   useEffect(() => {
@@ -157,6 +220,7 @@ export const PeriodicTable = memo(function PeriodicTable({
   // sit flush against the drink cell below it.
   const grid = (
     <Box
+      ref={gridRef}
       sx={{
         display: 'inline-grid',
         gridTemplateRows: `auto auto repeat(10, ${cellHeight}px)`,
@@ -173,7 +237,7 @@ export const PeriodicTable = memo(function PeriodicTable({
           textAlign: 'center',
           fontWeight: 'bold',
           py: 1,
-          fontSize: isCompact ? '48pt' : '98pt'
+          fontSize: isCompact ? '48pt' : '98pt',
         }}
       >
         Periodic Table of Drinks
@@ -279,7 +343,10 @@ export const PeriodicTable = memo(function PeriodicTable({
   )
 
   return (
-    <Box ref={containerRef} sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
+    <Box
+      ref={containerRef}
+      sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}
+    >
       <TransformWrapper
         ref={transformRef}
         initialScale={calculateScale(cellWidth, cellHeight)}
