@@ -22,6 +22,7 @@ const COMPACT_LABEL_COL_W = 20 // width of row-number column in compact mode
 const COMPACT_LABEL_ROW_H = 16 // height of column-number row in compact mode
 const COMPACT_TITLE_ROW_H = 64 // estimated height of the title row
 const SCALE_PADDING = 32
+const PAN_MARGIN = 64 // minimum margin between table edge and viewport edge when panning
 
 function calculateScale(cellWidth: number, cellHeight: number): number {
   const scaleFactor = cellWidth / COMPACT_CELL_WIDTH
@@ -114,7 +115,7 @@ export const PeriodicTable = memo(function PeriodicTable({
         )
         return
       }
-      // Regular scroll: pan with same bounds as drag
+      // Regular scroll: pan with margin-aware bounds
       let newX = state.positionX - e.deltaX
       let newY = state.positionY - e.deltaY
       const grid = gridRef.current
@@ -123,13 +124,14 @@ export const PeriodicTable = memo(function PeriodicTable({
         const gridH = grid.offsetHeight * state.scale
         const wrapperW = window.innerWidth
         const wrapperH = window.innerHeight
+        const m = PAN_MARGIN
         newX = Math.min(
-          Math.max(newX, Math.min(0, wrapperW - gridW)),
-          Math.max(0, wrapperW - gridW),
+          Math.max(newX, Math.min(m, wrapperW - gridW - m)),
+          Math.max(m, wrapperW - gridW + m),
         )
         newY = Math.min(
-          Math.max(newY, Math.min(0, wrapperH - gridH)),
-          Math.max(0, wrapperH - gridH),
+          Math.max(newY, Math.min(m, wrapperH - gridH - m)),
+          Math.max(m, wrapperH - gridH + m),
         )
       }
       transformRef?.current?.setTransform(newX, newY, state.scale, 0)
@@ -353,8 +355,30 @@ export const PeriodicTable = memo(function PeriodicTable({
         minScale={0.1}
         maxScale={4}
         centerOnInit
+        limitToBounds={false}
         wheel={{ disabled: true }}
         onTransformed={(_, state) => onZoomChange?.(state.scale)}
+        onPanningStop={(ref) => {
+          const s = ref.instance.transformState
+          const grid = gridRef.current
+          if (!grid) return
+          const gridW = grid.offsetWidth * s.scale
+          const gridH = grid.offsetHeight * s.scale
+          const wrapperW = window.innerWidth
+          const wrapperH = window.innerHeight
+          const m = PAN_MARGIN
+          const newX = Math.min(
+            Math.max(s.positionX, Math.min(m, wrapperW - gridW - m)),
+            Math.max(m, wrapperW - gridW + m),
+          )
+          const newY = Math.min(
+            Math.max(s.positionY, Math.min(m, wrapperH - gridH - m)),
+            Math.max(m, wrapperH - gridH + m),
+          )
+          if (newX !== s.positionX || newY !== s.positionY) {
+            ref.setTransform(newX, newY, s.scale, 200)
+          }
+        }}
       >
         <TransformComponent wrapperStyle={{ width: '100vw', height: '100vh' }}>
           {grid}
