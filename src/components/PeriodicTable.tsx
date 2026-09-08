@@ -21,6 +21,22 @@ const MIN_SCALE = 0.1
 const MAX_SCALE = 4
 const FIT_ANIMATION_MS = 200
 
+type Extent = [[number, number], [number, number]]
+
+// Mirrors d3-zoom's own default constrain (read from its source, since the library
+// doesn't export it): pins translateExtent's edges to extent's edges when the content is
+// larger than the viewport on that axis, and centers it when the content is smaller.
+function defaultConstrain(transform: ZoomTransform, extent: Extent, translateExtent: Extent): ZoomTransform {
+  const dx0 = transform.invertX(extent[0][0]) - translateExtent[0][0]
+  const dx1 = transform.invertX(extent[1][0]) - translateExtent[1][0]
+  const dy0 = transform.invertY(extent[0][1]) - translateExtent[0][1]
+  const dy1 = transform.invertY(extent[1][1]) - translateExtent[1][1]
+  return transform.translate(
+    dx1 > dx0 ? (dx0 + dx1) / 2 : Math.min(0, dx0) || Math.max(0, dx1),
+    dy1 > dy0 ? (dy0 + dy1) / 2 : Math.min(0, dy0) || Math.max(0, dy1),
+  )
+}
+
 // The imperative API PeriodicTable exposes on `transformRef`, for ControlPanel's zoom
 // buttons. A plain object assigned to the ref rather than useImperativeHandle, since
 // transformRef is an ordinary prop here, not a forwarded ref.
@@ -55,6 +71,32 @@ export const PeriodicTable = memo(function PeriodicTable({
   const containerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
+  // Kept in sync with cellWidth/cellHeight on every render so constrainWithEdgeMargin
+  // (configured once, below) always sees the current view mode's cell size without
+  // needing to be reconfigured on every view-mode toggle.
+  const cellSizeRef = useRef({ width: cellWidth, height: cellHeight })
+  useLayoutEffect(() => {
+    cellSizeRef.current = { width: cellWidth, height: cellHeight }
+  }, [cellWidth, cellHeight])
+
+  // Expands translateExtent by a per-axis margin before applying defaultConstrain, so
+  // panning past the table's true edge is allowed rather than stopping flush against it.
+  // The margin is derived fresh from the transform's *current* scale on every call — a
+  // static, pre-expanded translateExtent can't do this, since the amount of world-space
+  // padding needed to hold a constant on-screen margin shrinks as you zoom in. Sized so
+  // that, at the panning limit, an edge cell can be centered in the viewport: half the
+  // viewport (in world units at this scale) minus half a cell.
+  const constrainWithEdgeMargin = useCallback((transform: ZoomTransform, extent: Extent, translateExtent: Extent): ZoomTransform => {
+    const { width, height } = cellSizeRef.current
+    const marginX = Math.max(0, (extent[1][0] - extent[0][0]) / (2 * transform.k) - width / 2)
+    const marginY = Math.max(0, (extent[1][1] - extent[0][1]) / (2 * transform.k) - height / 2)
+    const expanded: Extent = [
+      [translateExtent[0][0] - marginX, translateExtent[0][1] - marginY],
+      [translateExtent[1][0] + marginX, translateExtent[1][1] + marginY],
+    ]
+    return defaultConstrain(transform, extent, expanded)
+  }, [])
+
   // A single zoom behavior instance for the component's lifetime. All panning and
   // zooming — drag, ctrl+wheel/trackpad-pinch zoom, touch pinch, the buttons below, and
   // fitToViewport — goes through this one object, which funnels every change through the
@@ -77,6 +119,7 @@ export const PeriodicTable = memo(function PeriodicTable({
     if (!container || !grid) return
     zoomBehavior
       .filter((event) => (event.type === 'wheel' ? event.ctrlKey : !event.button))
+      .constrain(constrainWithEdgeMargin)
       .on('zoom', (event) => {
         // Not event.transform.toString(): that emits SVG transform-attribute syntax
         // (unitless translate), which is invalid as a CSS transform property value —
@@ -90,7 +133,7 @@ export const PeriodicTable = memo(function PeriodicTable({
     return () => {
       select(container).on('.zoom', null)
     }
-  }, [zoomBehavior, onZoomChange])
+  }, [zoomBehavior, onZoomChange, constrainWithEdgeMargin])
 
   // Scales and centers the table to fit the viewport, measuring the grid's actual
   // (unscaled) rendered size rather than predicting it from layout constants — so this
