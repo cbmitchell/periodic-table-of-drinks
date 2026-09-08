@@ -1,10 +1,8 @@
 import { Box, Typography } from '@mui/material'
-import { memo, useEffect, useMemo, useRef } from 'react'
-import {
-  TransformComponent,
-  TransformWrapper,
-  type ReactZoomPanPinchRef,
-} from 'react-zoom-pan-pinch'
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { select } from 'd3-selection'
+import 'd3-transition' // side-effect import: adds Selection.prototype.transition (used for animated zoom/fit)
+import { zoom, zoomTransform, ZoomTransform } from 'd3-zoom'
 import type { ElementGroup } from '../types/ElementGroup'
 import {
   CELL_HEIGHT,
@@ -18,23 +16,18 @@ import { CellLegend } from './CellLegend'
 import { GroupKeyLegend } from './GroupKeyLegend'
 
 const GAP_PX = 4 // MUI gap: 0.5 = 4px
-const COMPACT_LABEL_COL_W = 20 // width of row-number column in compact mode
-const COMPACT_LABEL_ROW_H = 16 // height of column-number row in compact mode
-const COMPACT_TITLE_ROW_H = 64 // estimated height of the title row
-const SCALE_PADDING = 32
+const SCALE_PADDING = 32 // viewport margin to leave around the fitted table
+const MIN_SCALE = 0.1
+const MAX_SCALE = 4
+const FIT_ANIMATION_MS = 200
 
-function calculateScale(cellWidth: number, cellHeight: number): number {
-  const scaleFactor = cellWidth / COMPACT_CELL_WIDTH
-  const labelColW = COMPACT_LABEL_COL_W * scaleFactor
-  const labelRowH = COMPACT_LABEL_ROW_H * scaleFactor
-  const titleRowH = COMPACT_TITLE_ROW_H * scaleFactor
-  const tableWidth = 18 * cellWidth + 17 * GAP_PX + GAP_PX + labelColW
-  const tableHeight =
-    10 * cellHeight + 9 * GAP_PX + GAP_PX + labelRowH + GAP_PX + titleRowH
-  return Math.min(
-    (window.innerWidth - SCALE_PADDING) / tableWidth,
-    (window.innerHeight - SCALE_PADDING) / tableHeight,
-  )
+// The imperative API PeriodicTable exposes on `transformRef`, for ControlPanel's zoom
+// buttons. A plain object assigned to the ref rather than useImperativeHandle, since
+// transformRef is an ordinary prop here, not a forwarded ref.
+export interface PanZoomHandle {
+  zoomIn: () => void
+  zoomOut: () => void
+  reset: () => void
 }
 
 interface PeriodicTableProps {
@@ -42,7 +35,7 @@ interface PeriodicTableProps {
   viewMode: 'full' | 'compact'
   onDrinkClick?: (drink: DrinkCellProps) => void
   groupLabels?: Partial<Record<ElementGroup, string>>
-  transformRef?: React.RefObject<ReactZoomPanPinchRef | null>
+  transformRef?: React.RefObject<PanZoomHandle | null>
   onZoomChange?: (scale: number) => void
 }
 
@@ -62,108 +55,137 @@ export const PeriodicTable = memo(function PeriodicTable({
   const containerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
+  // A single zoom behavior instance for the component's lifetime. All panning and
+  // zooming — drag, ctrl+wheel/trackpad-pinch zoom, touch pinch, the buttons below, and
+  // fitToViewport — goes through this one object, which funnels every change through the
+  // same constrain(transform, extent, translateExtent) step before it's ever applied.
+  // There's no separate cached bounds value for any interaction to fall out of sync with.
+  const zoomBehavior = useMemo(
+    () =>
+      zoom<HTMLDivElement, unknown>()
+        .scaleExtent([MIN_SCALE, MAX_SCALE])
+        .clickDistance(5), // suppresses the click event after a real drag, so panning a cell out from under the cursor doesn't also open it
+    [],
+  )
+
+  // Binds the zoom behavior to the container: drag and ctrl+wheel/pinch zoom (native to
+  // the library, self-consistent) plus applying the resulting transform to the grid.
+  // Plain scroll is filtered out here and handled by the separate wheel effect below.
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    const grid = gridRef.current
+    if (!container || !grid) return
+    zoomBehavior
+      .filter((event) => (event.type === 'wheel' ? event.ctrlKey : !event.button))
+      .on('zoom', (event) => {
+        // Not event.transform.toString(): that emits SVG transform-attribute syntax
+        // (unitless translate), which is invalid as a CSS transform property value —
+        // the browser silently drops it, with no console error, leaving the element
+        // untransformed.
+        const { k, x, y } = event.transform
+        grid.style.transform = `translate(${x}px, ${y}px) scale(${k})`
+        onZoomChange?.(k)
+      })
+    select(container).call(zoomBehavior)
+    return () => {
+      select(container).on('.zoom', null)
+    }
+  }, [zoomBehavior, onZoomChange])
+
+  // Scales and centers the table to fit the viewport, measuring the grid's actual
+  // (unscaled) rendered size rather than predicting it from layout constants — so this
+  // can't drift out of sync with DrinkCell's dimensions or the grid's own shape. Also
+  // keeps translateExtent (the pan boundary) up to date with that same measurement, so
+  // panning can never be bounded against a stale size.
+  const fitToViewport = useCallback(
+    (animate: boolean) => {
+      const container = containerRef.current
+      const grid = gridRef.current
+      if (!container || !grid) return
+      const scale = Math.min(
+        MAX_SCALE,
+        Math.max(
+          MIN_SCALE,
+          Math.min(
+            (window.innerWidth - SCALE_PADDING) / grid.offsetWidth,
+            (window.innerHeight - SCALE_PADDING) / grid.offsetHeight,
+          ),
+        ),
+      )
+      zoomBehavior.translateExtent([
+        [0, 0],
+        [grid.offsetWidth, grid.offsetHeight],
+      ])
+      const target = new ZoomTransform(
+        scale,
+        (window.innerWidth - grid.offsetWidth * scale) / 2,
+        (window.innerHeight - grid.offsetHeight * scale) / 2,
+      )
+      const selection = select(container)
+      if (animate) {
+        selection.transition().duration(FIT_ANIMATION_MS).call(zoomBehavior.transform, target)
+      } else {
+        selection.call(zoomBehavior.transform, target)
+      }
+    },
+    [zoomBehavior],
+  )
+
+  // Runs before paint, both immediately on mount and whenever the grid's own rendered
+  // size changes for any reason (a view-mode toggle, different drink data, font-load
+  // reflow, ...) — observing the real element means this can't miss a cause of resize
+  // the way a hardcoded dependency list could.
+  useLayoutEffect(() => {
+    fitToViewport(false)
+    const grid = gridRef.current
+    if (!grid) return
+    const observer = new ResizeObserver(() => fitToViewport(false))
+    observer.observe(grid)
+    return () => observer.disconnect()
+  }, [fitToViewport])
+
   useEffect(() => {
-    const handleResize = () =>
-      transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
+    const handleResize = () => fitToViewport(true)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [transformRef, cellWidth, cellHeight])
+  }, [fitToViewport])
 
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-    let startX = 0,
-      startY = 0
-    const onPointerDown = (e: PointerEvent) => {
-      startX = e.clientX
-      startY = e.clientY
-    }
-    const onClickCapture = (e: MouseEvent) => {
-      if (Math.hypot(e.clientX - startX, e.clientY - startY) > 5)
-        e.stopPropagation()
-    }
-    container.addEventListener('pointerdown', onPointerDown)
-    container.addEventListener('click', onClickCapture, { capture: true })
-    return () => {
-      container.removeEventListener('pointerdown', onPointerDown)
-      container.removeEventListener('click', onClickCapture, { capture: true })
-    }
-  }, [])
-
+  // Plain scroll pans the table; ctrl+scroll/trackpad-pinch zoom is left entirely to the
+  // zoom behavior above (it recalculates its own pan bounds on every zoom, so it's
+  // trustworthy) — that behavior's filter rejects non-ctrl wheel events, so this is the
+  // only handler acting on them. translateBy reads the current transform itself and runs
+  // through the same constrain step as every other interaction.
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
     const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return
       e.preventDefault()
-      const state = transformRef?.current?.instance.transformState
-      if (!state) return
-      if (e.ctrlKey) {
-        // Trackpad pinch: zoom toward cursor position
-        const scaleFactor = Math.exp(-e.deltaY * 0.003)
-        const newScale = Math.min(Math.max(state.scale * scaleFactor, 0.1), 4)
-        const rect = container.getBoundingClientRect()
-        const mouseX = e.clientX - rect.left
-        const mouseY = e.clientY - rect.top
-        const contentX = (mouseX - state.positionX) / state.scale
-        const contentY = (mouseY - state.positionY) / state.scale
-        transformRef?.current?.setTransform(
-          mouseX - contentX * newScale,
-          mouseY - contentY * newScale,
-          newScale,
-          0,
-        )
-        return
-      }
-      // Regular scroll: pan with same bounds as drag
-      let newX = state.positionX - e.deltaX
-      let newY = state.positionY - e.deltaY
-      const grid = gridRef.current
-      if (grid) {
-        const gridW = grid.offsetWidth * state.scale
-        const gridH = grid.offsetHeight * state.scale
-        const wrapperW = window.innerWidth
-        const wrapperH = window.innerHeight
-        newX = Math.min(
-          Math.max(newX, Math.min(0, wrapperW - gridW)),
-          Math.max(0, wrapperW - gridW),
-        )
-        newY = Math.min(
-          Math.max(newY, Math.min(0, wrapperH - gridH)),
-          Math.max(0, wrapperH - gridH),
-        )
-      }
-      transformRef?.current?.setTransform(newX, newY, state.scale, 0)
-
-      // After scroll ends, center any axis where the content fits in the viewport
-      clearTimeout(scrollEndTimer)
-      scrollEndTimer = setTimeout(() => {
-        const s = transformRef?.current?.instance.transformState
-        const g = gridRef.current
-        if (!s || !g) return
-        const gridW = g.offsetWidth * s.scale
-        const gridH = g.offsetHeight * s.scale
-        const fitsX = gridW <= window.innerWidth
-        const fitsY = gridH <= window.innerHeight
-        if (!fitsX && !fitsY) return
-        transformRef?.current?.setTransform(
-          fitsX ? (window.innerWidth - gridW) / 2 : s.positionX,
-          fitsY ? (window.innerHeight - gridH) / 2 : s.positionY,
-          s.scale,
-          200,
-        )
-      }, 75)
+      const { k } = zoomTransform(container)
+      zoomBehavior.translateBy(select(container), -e.deltaX / k, -e.deltaY / k)
     }
-    let scrollEndTimer: ReturnType<typeof setTimeout>
     container.addEventListener('wheel', handleWheel, { passive: false })
-    return () => {
-      container.removeEventListener('wheel', handleWheel)
-      clearTimeout(scrollEndTimer)
-    }
-  }, [transformRef])
+    return () => container.removeEventListener('wheel', handleWheel)
+  }, [zoomBehavior])
 
+  // Exposes zoomIn/zoomOut/reset to ControlPanel. A plain assignment rather than
+  // useImperativeHandle since transformRef is an ordinary prop, not a forwarded ref.
   useEffect(() => {
-    transformRef?.current?.centerView(calculateScale(cellWidth, cellHeight))
-  }, [transformRef, cellWidth, cellHeight])
+    if (!transformRef) return
+    const container = containerRef.current
+    const scaleBy = (k: number) => {
+      if (!container) return
+      select(container).transition().duration(FIT_ANIMATION_MS).call(zoomBehavior.scaleBy, k)
+    }
+    transformRef.current = {
+      zoomIn: () => scaleBy(1.5),
+      zoomOut: () => scaleBy(1 / 1.5),
+      reset: () => fitToViewport(true),
+    }
+    return () => {
+      transformRef.current = null
+    }
+  }, [transformRef, zoomBehavior, fitToViewport])
 
   // Compute the first (minimum) row occupied in each column, so each column
   // number can be placed just above that cell rather than at a uniform top.
@@ -226,6 +248,7 @@ export const PeriodicTable = memo(function PeriodicTable({
         gridTemplateRows: `auto auto repeat(10, ${cellHeight}px)`,
         gridTemplateColumns: `auto repeat(18, ${cellWidth}px)`,
         gap: 0.5,
+        transformOrigin: '0 0',
       }}
     >
       {/* Title — spans the full grid width in the first row */}
@@ -347,19 +370,7 @@ export const PeriodicTable = memo(function PeriodicTable({
       ref={containerRef}
       sx={{ position: 'fixed', inset: 0, overflow: 'hidden' }}
     >
-      <TransformWrapper
-        ref={transformRef}
-        initialScale={calculateScale(cellWidth, cellHeight)}
-        minScale={0.1}
-        maxScale={4}
-        centerOnInit
-        wheel={{ disabled: true }}
-        onTransformed={(_, state) => onZoomChange?.(state.scale)}
-      >
-        <TransformComponent wrapperStyle={{ width: '100vw', height: '100vh' }}>
-          {grid}
-        </TransformComponent>
-      </TransformWrapper>
+      {grid}
     </Box>
   )
 })

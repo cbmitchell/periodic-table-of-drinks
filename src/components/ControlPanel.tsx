@@ -18,9 +18,9 @@ import {
   Switch,
   Typography,
 } from '@mui/material'
-import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
 import { drinkLists } from '../assets/drinkData'
 import type { ListSelection } from '../types/ListSelection'
+import type { PanZoomHandle } from './PeriodicTable'
 
 interface ControlPanelProps {
   viewMode: 'full' | 'compact'
@@ -31,7 +31,7 @@ interface ControlPanelProps {
   onListChange: (selection: ListSelection) => void
   darkMode: boolean
   onDarkModeToggle: () => void
-  zoomRef?: React.RefObject<ReactZoomPanPinchRef | null>
+  zoomRef?: React.RefObject<PanZoomHandle | null>
   zoomScale?: number | null
 }
 
@@ -132,7 +132,7 @@ export function ControlPanel({
               </IconButton>
               <IconButton
                 size="small"
-                onClick={() => zoomRef?.current?.resetTransform()}
+                onClick={() => zoomRef?.current?.reset()}
                 sx={{ pointerEvents: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}
               >
                 <RestartAltIcon fontSize="small" />

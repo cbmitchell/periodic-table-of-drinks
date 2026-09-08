@@ -1,14 +1,13 @@
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { drinkLists } from "./assets/drinkData";
 import { ControlPanel } from "./components/ControlPanel";
 import { ViewportOverlay } from "./components/ViewportOverlay";
 import type { DrinkCellProps } from "./components/DrinkCell";
 import { DrinkDetailModal } from "./components/DrinkDetailModal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { PeriodicTable } from "./components/PeriodicTable";
+import { PeriodicTable, type PanZoomHandle } from "./components/PeriodicTable";
 import { darkTheme, lightTheme } from "./theme";
 import type { ListSelection } from "./types/ListSelection";
 import { fillDrinkData } from "./utils/fillDrinkData";
@@ -39,7 +38,7 @@ export default function App() {
 		return 0;
 	});
 	const [darkMode, setDarkMode] = useSessionStorage("ptod_dark_mode", false);
-	const zoomRef = useRef<ReactZoomPanPinchRef>(null);
+	const zoomRef = useRef<PanZoomHandle>(null);
 	const [zoomScale, setZoomScale] = useState<number | null>(null);
 
 	const filledDrinkData = useMemo(() => {
