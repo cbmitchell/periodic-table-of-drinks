@@ -11,9 +11,12 @@ import { PeriodicTable, type PanZoomHandle } from "./components/PeriodicTable";
 import { darkTheme, lightTheme } from "./theme";
 import type { ListSelection } from "./types/ListSelection";
 import { fillDrinkData } from "./utils/fillDrinkData";
+import { useIOSStandaloneTouchFix } from "./utils/useIOSStandaloneTouchFix";
 import { useSessionStorage } from "./utils/useSessionStorage";
 
 export default function App() {
+	useIOSStandaloneTouchFix();
+
 	const [viewMode, setViewMode] = useSessionStorage<"full" | "compact">(
 		"ptod_view_mode",
 		"compact",
